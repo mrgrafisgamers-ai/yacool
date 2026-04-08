@@ -244,26 +244,48 @@
     }
 }
     async function loadAdminStats() {
+    try {
         const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData' }) });
         const d = await r.json();
-        let totO = 0, totC = 0;
-        d.sales.slice(1).forEach(s => { totO += parseInt(s[2]) || 0; totC += parseInt(s[6]) || 0; });
         
+        let totO = 0, totC = 0;
+        d.sales.slice(1).forEach(s => { 
+            totO += parseInt(s[2]) || 0; 
+            totC += parseInt(s[6]) || 0; 
+        });
+        
+        // Simpan data stok ke dalam variabel untuk mempermudah pencarian
         let sData = {};
         d.stok.slice(1).forEach(row => { sData[row[0]] = row[1]; });
 
+        // Tampilkan Ringkasan di Kotak Atas
         document.getElementById('adm-omset').innerText = "Rp " + totO.toLocaleString();
         document.getElementById('adm-cups').innerText = totC + " Cup";
         document.getElementById('adm-stok-cup').innerText = (sData["Cup"] || 0) + " Pcs";
         document.getElementById('adm-profit').innerText = "Rp " + (totC * 2500).toLocaleString();
 
-        document.getElementById('adm-detail-stok').innerHTML = `
-            <div class="d-flex justify-content-between border-bottom py-1"><span>Susu UHT</span><b>${sData["Susu"] || 0} ml</b></div>
-            <div class="d-flex justify-content-between border-bottom py-1"><span>Yakult</span><b>${sData["Yakult"] || 0} Pcs</b></div>
-            <div class="d-flex justify-content-between border-bottom py-1"><span>Nutrisari</span><b>${sData["Nutrisari"] || 0} Sachet</b></div>
-        `;
-    }
+        // --- INI BAGIAN YANG TADI BAPAK BINGUNG ---
+        // Kita buat daftar stok bahan otomatis (dinamis)
+        let htmlStok = "";
+        d.stok.slice(1).forEach(row => {
+            // Jika stok sisa dikit (kurang dari 10), warnanya jadi merah
+            let warna = row[1] < 10 ? 'text-danger' : 'text-dark'; 
+            
+            htmlStok += `
+                <div class="d-flex justify-content-between border-bottom py-1">
+                    <span>${row[0]}</span>
+                    <b class="${warna}">${row[1]}</b>
+                </div>`;
+        });
+        
+        // Masukkan semua daftar tadi ke dalam kotak "Detail Bahan Baku"
+        document.getElementById('adm-detail-stok').innerHTML = htmlStok;
+        // ------------------------------------------
 
+    } catch (e) {
+        console.error("Gagal memuat data admin:", e);
+    }
+}
     async function showHistory() {
     document.getElementById('area-kasir').classList.add('hidden');
     document.getElementById('area-history').classList.remove('hidden');
