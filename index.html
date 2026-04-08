@@ -67,6 +67,14 @@
         <h3 class="fw-bold">Admin Panel</h3>
         <button onclick="location.reload()" class="btn btn-danger btn-sm">Keluar</button>
     </div>
+    <div class="card p-3 mb-4 shadow-sm">
+        <label class="small fw-bold mb-1">Lihat Laporan Tanggal:</label>
+        <div class="input-group">
+            <input type="date" id="admin-filter-date" class="form-control">
+            <button class="btn btn-primary" onclick="loadAdminStats()"><i class="bi bi-search"></i></button>
+            <button class="btn btn-success" onclick="printLaporan()"><i class="bi bi-printer"></i> Cetak</button>
+        </div>
+    </div>
     <div class="row g-3 mb-4">
         <div class="col-6 col-md-3"><div class="stat-card"><p class="small text-muted mb-1">OMSET</p><h4 id="adm-omset">0</h4></div></div>
         <div class="col-6 col-md-3"><div class="stat-card"><p class="small text-muted mb-1">TERJUAL</p><h4 id="adm-cups">0</h4></div></div>
@@ -245,19 +253,23 @@
 }
     async function loadAdminStats() {
     try {
+        const filterInput = document.getElementById('admin-filter-date');
+        // Jika input kosong, default ke hari ini
+        if (!filterInput.value) {
+            filterInput.value = new Date().toISOString().split('T')[0];
+        }
+        
         const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData' }) });
         const d = await r.json();
         
         let totO = 0, totC = 0;
-        const hariIni = new Date().toLocaleDateString('id-ID'); // Format: DD/MM/YYYY
+        // Format tanggal dari input untuk pencocokan (YYYY-MM-DD)
+        const targetDate = new Date(filterInput.value).toLocaleDateString('id-ID');
 
         if (d.sales && d.sales.length > 1) {
             d.sales.slice(1).forEach(s => { 
-                // Ambil tanggal dari kolom A Sheets
                 const tglTransaksi = new Date(s[0]).toLocaleDateString('id-ID');
-                
-                // HANYA HITUNG JIKA TANGGALNYA SAMA DENGAN HARI INI
-                if (tglTransaksi === hariIni) {
+                if (tglTransaksi === targetDate) {
                     totO += parseInt(s[2]) || 0; 
                     totC += parseInt(s[6]) || 0; 
                 }
@@ -269,25 +281,55 @@
             d.stok.slice(1).forEach(row => { sData[row[0]] = row[1]; });
         }
 
-        // Tampilkan ke layar
-        document.getElementById('adm-omset').innerText = "Rp " + (totO || 0).toLocaleString();
-        document.getElementById('adm-cups').innerText = (totC || 0) + " Cup";
-        document.getElementById('adm-stok-cup').innerText = (sData["Cup"] || 0) + " Pcs"; // Stok sisa di gudang
-        document.getElementById('adm-profit').innerText = "Rp " + ((totC * 2500) || 0).toLocaleString();
+        // Update tampilan angka
+        document.getElementById('adm-omset').innerText = "Rp " + totO.toLocaleString();
+        document.getElementById('adm-cups').innerText = totC + " Cup";
+        document.getElementById('adm-stok-cup').innerText = (sData["Cup"] || 0) + " Pcs";
+        document.getElementById('adm-profit').innerText = "Rp " + (totC * 2500).toLocaleString();
 
-        // Tampilkan Semua Detail Bahan (Susu, Yakult, Semua Rasa)
+        // Update daftar stok sisa
         let htmlStok = "";
         d.stok.slice(1).forEach(row => {
             let warna = row[1] < 10 ? 'text-danger' : 'text-dark'; 
-            htmlStok += `
-                <div class="d-flex justify-content-between border-bottom py-1">
-                    <span>${row[0]}</span>
-                    <b class="${warna}">${row[1] || 0}</b>
-                </div>`;
+            htmlStok += `<div class="d-flex justify-content-between border-bottom py-1"><span>${row[0]}</span><b class="${warna}">${row[1] || 0}</b></div>`;
         });
         document.getElementById('adm-detail-stok').innerHTML = htmlStok;
 
-    } catch (e) { console.error("Error Load Admin:", e); }
+    } catch (e) { alert("Gagal memuat data tanggal tersebut"); }
+}
+    function printLaporan() {
+    const tgl = document.getElementById('admin-filter-date').value;
+    const oms = document.getElementById('adm-omset').innerText;
+    const cup = document.getElementById('adm-cups').innerText;
+    const prf = document.getElementById('adm-profit').innerText;
+
+    let t = "   LAPORAN PENJUALAN\n";
+    t += "      YA!COOL DRINK\n";
+    t += "--------------------------------\n";
+    t += "Tanggal : " + tgl + "\n";
+    t += "--------------------------------\n";
+    t += "OMSET   : " + oms.padStart(18) + "\n";
+    t += "TERJUAL : " + cup.padStart(18) + "\n";
+    t += "PROFIT  : " + prf.padStart(18) + "\n";
+    t += "--------------------------------\n";
+    t += "SISA STOK BAHAN UTAMA:\n";
+    
+    // Ambil data stok yang tampil di layar admin
+    const listStok = document.getElementById('adm-detail-stok').innerText;
+    t += listStok + "\n";
+    t += "--------------------------------\n";
+    t += "\n     Laporan Dicetak pada:\n";
+    t += "     " + new Date().toLocaleString() + "\n\n\n\n";
+
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    if (isAndroid) {
+        const intent = "intent:#Intent;content=" + encodeURIComponent(t) + ";action=ru.a402nd.rawbtprinter.action.PRINT;category=android.intent.category.DEFAULT;type=text/plain;end;";
+        const a = document.createElement('a');
+        a.href = intent;
+        a.click();
+    } else {
+        alert("Gunakan HP Android untuk cetak langsung");
+    }
 }
     async function showHistory() {
     document.getElementById('area-kasir').classList.add('hidden');
