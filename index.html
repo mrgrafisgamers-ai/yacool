@@ -200,31 +200,48 @@
     }
 
     function printResi(items, tot, cash, chg, ksr) {
-        const isAndroid = /Android/i.test(navigator.userAgent);
-        if (isAndroid) {
-            let t = "      YA!COOL DRINK\n  " + new Date().toLocaleString() + "\n--------------------------------\n";
-            items.forEach(i => {
-                let n = i.n.substring(0, 20);
-                let p = i.p.toLocaleString();
-                t += n + " ".repeat(32 - (n.length + p.length)) + p + "\n";
-            });
-            t += "--------------------------------\n";
-            t += "TOTAL:   " + tot.toLocaleString().padStart(23) + "\n";
-            t += "BAYAR:   " + cash.toLocaleString().padStart(23) + "\n";
-            t += "KEMBALI: " + chg.toLocaleString().padStart(21) + "\n";
-            t += "--------------------------------\nKasir: " + ksr + "\n\n      TERIMA KASIH\n\n\n\n";
-            window.location.href = "intent:#Intent;content=" + encodeURIComponent(t) + ";action=ru.a402nd.rawbtprinter.action.PRINT;category=android.intent.category.DEFAULT;type=text/plain;end;";
-        } else {
-            document.getElementById('r-date').innerText = new Date().toLocaleString();
-            document.getElementById('r-items').innerHTML = items.map(i => `<div style="display:flex;justify-content:space-between"><span>${i.n}</span><span>${i.p.toLocaleString()}</span></div>`).join('');
-            document.getElementById('r-total').innerText = tot.toLocaleString();
-            document.getElementById('r-cash').innerText = cash.toLocaleString();
-            document.getElementById('r-change').innerText = chg.toLocaleString();
-            document.getElementById('r-kasir').innerText = ksr;
-            window.print();
-        }
-    }
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    
+    // Siapkan teks struk
+    let t = "      YA!COOL DRINK\n";
+    t += "  " + new Date().toLocaleString() + "\n";
+    t += "--------------------------------\n";
+    
+    items.forEach(i => {
+        let n = i.n.substring(0, 20);
+        let p = i.p.toLocaleString();
+        // Hitung spasi agar harga rata kanan (32 karakter)
+        let s = 32 - (n.length + p.length);
+        t += n + " ".repeat(s > 0 ? s : 1) + p + "\n";
+    });
+    
+    t += "--------------------------------\n";
+    t += "TOTAL:   " + tot.toLocaleString().padStart(23) + "\n";
+    t += "BAYAR:   " + cash.toLocaleString().padStart(23) + "\n";
+    t += "KEMBALI: " + chg.toLocaleString().padStart(21) + "\n";
+    t += "--------------------------------\nKasir: " + ksr + "\n\n      TERIMA KASIH\n\n\n\n";
 
+    if (isAndroid) {
+        // Gunakan skema Intent yang paling kompatibel dengan Chrome Mobile
+        const intent = "intent:#Intent;content=" + encodeURIComponent(t) + ";action=ru.a402nd.rawbtprinter.action.PRINT;category=android.intent.category.DEFAULT;type=text/plain;end;";
+        
+        // Eksekusi dengan cara klik link otomatis (lebih ampuh dari window.location)
+        const a = document.createElement('a');
+        a.href = intent;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    } else {
+        // Jika pakai Laptop
+        document.getElementById('r-date').innerText = new Date().toLocaleString();
+        document.getElementById('r-items').innerHTML = items.map(i => `<div style="display:flex;justify-content:space-between"><span>${i.n}</span><span>${i.p.toLocaleString()}</span></div>`).join('');
+        document.getElementById('r-total').innerText = tot.toLocaleString();
+        document.getElementById('r-cash').innerText = cash.toLocaleString();
+        document.getElementById('r-change').innerText = chg.toLocaleString();
+        document.getElementById('r-kasir').innerText = ksr;
+        window.print();
+    }
+}
     async function loadAdminStats() {
         const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData' }) });
         const d = await r.json();
