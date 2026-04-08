@@ -249,42 +249,45 @@
         const d = await r.json();
         
         let totO = 0, totC = 0;
-        d.sales.slice(1).forEach(s => { 
-            totO += parseInt(s[2]) || 0; 
-            totC += parseInt(s[6]) || 0; 
-        });
+        const hariIni = new Date().toLocaleDateString('id-ID'); // Format: DD/MM/YYYY
+
+        if (d.sales && d.sales.length > 1) {
+            d.sales.slice(1).forEach(s => { 
+                // Ambil tanggal dari kolom A Sheets
+                const tglTransaksi = new Date(s[0]).toLocaleDateString('id-ID');
+                
+                // HANYA HITUNG JIKA TANGGALNYA SAMA DENGAN HARI INI
+                if (tglTransaksi === hariIni) {
+                    totO += parseInt(s[2]) || 0; 
+                    totC += parseInt(s[6]) || 0; 
+                }
+            });
+        }
         
-        // Simpan data stok ke dalam variabel untuk mempermudah pencarian
         let sData = {};
-        d.stok.slice(1).forEach(row => { sData[row[0]] = row[1]; });
+        if (d.stok) {
+            d.stok.slice(1).forEach(row => { sData[row[0]] = row[1]; });
+        }
 
-        // Tampilkan Ringkasan di Kotak Atas
-        document.getElementById('adm-omset').innerText = "Rp " + totO.toLocaleString();
-        document.getElementById('adm-cups').innerText = totC + " Cup";
-        document.getElementById('adm-stok-cup').innerText = (sData["Cup"] || 0) + " Pcs";
-        document.getElementById('adm-profit').innerText = "Rp " + (totC * 2500).toLocaleString();
+        // Tampilkan ke layar
+        document.getElementById('adm-omset').innerText = "Rp " + (totO || 0).toLocaleString();
+        document.getElementById('adm-cups').innerText = (totC || 0) + " Cup";
+        document.getElementById('adm-stok-cup').innerText = (sData["Cup"] || 0) + " Pcs"; // Stok sisa di gudang
+        document.getElementById('adm-profit').innerText = "Rp " + ((totC * 2500) || 0).toLocaleString();
 
-        // --- INI BAGIAN YANG TADI BAPAK BINGUNG ---
-        // Kita buat daftar stok bahan otomatis (dinamis)
+        // Tampilkan Semua Detail Bahan (Susu, Yakult, Semua Rasa)
         let htmlStok = "";
         d.stok.slice(1).forEach(row => {
-            // Jika stok sisa dikit (kurang dari 10), warnanya jadi merah
             let warna = row[1] < 10 ? 'text-danger' : 'text-dark'; 
-            
             htmlStok += `
                 <div class="d-flex justify-content-between border-bottom py-1">
                     <span>${row[0]}</span>
-                    <b class="${warna}">${row[1]}</b>
+                    <b class="${warna}">${row[1] || 0}</b>
                 </div>`;
         });
-        
-        // Masukkan semua daftar tadi ke dalam kotak "Detail Bahan Baku"
         document.getElementById('adm-detail-stok').innerHTML = htmlStok;
-        // ------------------------------------------
 
-    } catch (e) {
-        console.error("Gagal memuat data admin:", e);
-    }
+    } catch (e) { console.error("Error Load Admin:", e); }
 }
     async function showHistory() {
     document.getElementById('area-kasir').classList.add('hidden');
