@@ -188,8 +188,8 @@
     t += "  " + new Date().toLocaleString() + "\n";
     t += "--------------------------------\n";
     
-    // Logika untuk menangani rincian (baik berupa Array maupun Teks)
     if (Array.isArray(items)) {
+        // JIKA CETAK DARI KASIR LANGSUNG (DATA ARRAY)
         items.forEach(i => {
             let n = i.n.substring(0, 20);
             let p = i.p.toLocaleString();
@@ -197,11 +197,16 @@
             t += n + " ".repeat(s > 0 ? s : 1) + p + "\n";
         });
     } else {
-        // Jika dari riwayat (History), pecah teks koma menjadi baris
-        items.split(", ").forEach(name => {
-            let p = "Item"; // Harga tidak tersimpan detail di history teks
-            let s = 32 - (name.length + p.length);
-            t += name + " ".repeat(s > 0 ? s : 1) + p + "\n";
+        // JIKA CETAK DARI HISTORY (DATA TEKS KOMA)
+        // Kita pecah teks "Original, Boba" menjadi per baris
+        const itemArray = items.split(", ");
+        itemArray.forEach(name => {
+            let n = name.substring(0, 20);
+            // Karena di history Sheets harga per item tidak disimpan, 
+            // kita beri penanda titik agar rapi secara visual
+            let p = "..."; 
+            let s = 32 - (n.length + p.length);
+            t += n + " ".repeat(s > 0 ? s : 1) + p + "\n";
         });
     }
     
@@ -219,8 +224,15 @@
         a.click();
         document.body.removeChild(a);
     } else {
+        // Untuk tampilan Print Preview di Laptop
         document.getElementById('r-date').innerText = new Date().toLocaleString();
-        document.getElementById('r-items').innerHTML = Array.isArray(items) ? items.map(i => `<div style="display:flex;justify-content:space-between"><span>${i.n}</span><span>${i.p.toLocaleString()}</span></div>`).join('') : "";
+        let listHtml = "";
+        if(Array.isArray(items)) {
+            listHtml = items.map(i => `<div style="display:flex;justify-content:space-between"><span>${i.n}</span><span>${i.p.toLocaleString()}</span></div>`).join('');
+        } else {
+            listHtml = items.split(", ").map(n => `<div style="display:flex;justify-content:space-between"><span>${n}</span><span>-</span></div>`).join('');
+        }
+        document.getElementById('r-items').innerHTML = listHtml;
         document.getElementById('r-total').innerText = tot.toLocaleString();
         document.getElementById('r-cash').innerText = cash.toLocaleString();
         document.getElementById('r-change').innerText = chg.toLocaleString();
@@ -228,7 +240,6 @@
         window.print();
     }
 }
-
     async function loadAdminStats() {
         const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData' }) });
         const d = await r.json();
@@ -251,13 +262,41 @@
     }
 
     async function showHistory() {
-        document.getElementById('area-kasir').classList.add('hidden');
-        document.getElementById('area-history').classList.remove('hidden');
+    document.getElementById('area-kasir').classList.add('hidden');
+    document.getElementById('area-history').classList.remove('hidden');
+    
+    try {
         const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData' }) });
         const d = await r.json();
-        const my = d.sales.slice(1).filter(s => s[5] === user).reverse();
-        document.getElementById('h-list').innerHTML = my.map(s => `<tr><td>${new Date(s[0]).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td><td>${parseInt(s[2]).toLocaleString()}</td><td><button class="btn btn-xs btn-primary py-0" onclick="printResi('${s[1]}',${s[2]},${s[3]},${s[4]},'${s[5]}')">Cetak</button></td></tr>`).join('');
+        
+        // Ambil data milik user yang sedang login, urutkan dari yang terbaru
+        const mySales = d.sales.slice(1).filter(s => s[5] === user).reverse();
+        
+        document.getElementById('h-list').innerHTML = mySales.map(s => {
+            const tgl = new Date(s[0]).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const itemTeks = s[1]; // Rincian menu (teks)
+            const totalHrg = parseInt(s[2]) || 0;
+            const bayarHrg = parseInt(s[3]) || 0;
+            const kembaliHrg = parseInt(s[4]) || 0;
+            const namaKasir = s[5];
+
+            // Masukkan semua data ke dalam fungsi printResi saat tombol diklik
+            return `
+            <tr>
+                <td>${tgl}</td>
+                <td>${totalHrg.toLocaleString()}</td>
+                <td>
+                    <button class="btn btn-primary btn-sm py-0" 
+                    onclick="printResi('${itemTeks}', ${totalHrg}, ${bayarHrg}, ${kembaliHrg}, '${namaKasir}')">
+                        <i class="bi bi-printer"></i>
+                    </button>
+                </td>
+            </tr>`;
+        }).join('');
+    } catch (e) {
+        alert("Gagal memuat history");
     }
+}
 
     function backToKasir() { document.getElementById('area-history').classList.add('hidden'); document.getElementById('area-kasir').classList.remove('hidden'); }
 </script>
