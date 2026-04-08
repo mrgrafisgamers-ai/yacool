@@ -5,117 +5,128 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <title>Ya!Cool POS - Pro Version</title>
+    <title>Ya!Cool POS Ultimate</title>
     <style>
-        :root { --primary-color: #0d6efd; }
-        body { background-color: #f4f7f6; font-family: 'Inter', sans-serif; }
+        body { background: #f0f2f5; font-family: sans-serif; }
         .hidden { display: none !important; }
-        
-        /* Menu Styling */
-        .btn-menu { cursor: pointer; border: none; transition: 0.3s; border-radius: 15px; height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .btn-menu:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(13, 110, 253, 0.2); background: #eef4ff; }
-        .btn-menu i { font-size: 1.5rem; color: var(--primary-color); }
-        
-        /* Cart Styling */
-        .cart-card { border-radius: 20px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
-        .cart-item { border-bottom: 1px dashed #dee2e6; padding: 10px 0; }
-        .cart-item:last-child { border-bottom: none; }
-        
-        /* Receipt */
-        #receipt { width: 80mm; padding: 5mm; display: none; font-family: 'Courier New', monospace; background: white; }
+        .card { border-radius: 15px; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+        .btn-item { cursor: pointer; background: white; border: 1px solid #ddd; height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; transition: 0.2s; }
+        .btn-item:hover { background: #e7f3ff; border-color: #007bff; transform: translateY(-3px); }
+        #receipt { width: 80mm; padding: 5mm; display: none; font-family: monospace; background: white; }
         @media print { .no-print { display: none; } #receipt { display: block !important; } }
     </style>
 </head>
 <body>
 
 <div id="p-login" class="container mt-5" style="max-width: 400px;">
-    <div class="card p-5 shadow-lg border-0 text-center" style="border-radius: 25px;">
-        <h2 class="fw-bold text-primary mb-2">Ya!Cool</h2>
-        <p class="text-muted mb-4">Silakan masuk ke akun Anda</p>
-        <div class="text-start">
-            <label class="small fw-bold">Username</label>
-            <input type="text" id="u" class="form-control mb-3" placeholder="Contoh: staf1">
-            <label class="small fw-bold">Password</label>
-            <input type="password" id="p" class="form-control mb-4" placeholder="••••••••">
+    <div class="card p-4 text-center">
+        <h2 class="fw-bold text-primary mb-4">Ya!Cool POS</h2>
+        <div class="mb-3 text-start">
+            <label class="form-label small fw-bold">Username</label>
+            <input type="text" id="u" class="form-control" placeholder="admin / staf1">
         </div>
-        <button onclick="doLogin()" id="b-login" class="btn btn-primary w-100 py-2 fw-bold shadow">MASUK SEKARANG</button>
+        <div class="mb-4 text-start">
+            <label class="form-label small fw-bold">Password</label>
+            <input type="password" id="p" class="form-control" placeholder="******">
+        </div>
+        <button onclick="doLogin()" id="btn-login" class="btn btn-primary w-100 py-2 fw-bold">MASUK</button>
     </div>
 </div>
 
-<div id="p-staff" class="container-fluid py-4 hidden">
-    <div class="row px-3">
+<div id="p-staff" class="container-fluid py-3 hidden">
+    <div class="row">
         <div class="col-md-8 no-print">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h4 class="fw-bold m-0"><i class="bi bi-shop text-primary"></i> Kasir Utama</h4>
-                <button onclick="logout()" class="btn btn-outline-danger btn-sm rounded-pill px-3">Logout</button>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold"><i class="bi bi-shop"></i> POS Kasir</h4>
+                <div>
+                    <button class="btn btn-sm btn-info me-2" onclick="showHistory()"><i class="bi bi-clock-history"></i> Riwayat Hari Ini</button>
+                    <button class="btn btn-sm btn-danger" onclick="logout()"><i class="bi bi-box-arrow-left"></i> Keluar</button>
+                </div>
             </div>
-            
-            <h6 class="text-muted fw-bold mb-3 small text-uppercase">Varian Rasa Utama</h6>
-            <div id="m-rasa" class="row g-3 mb-5"></div>
-            
-            <h6 class="text-muted fw-bold mb-3 small text-uppercase">Tambahan Topping</h6>
-            <div id="m-topping" class="row g-3"></div>
+
+            <div id="area-kasir">
+                <h6 class="text-muted fw-bold">MINUMAN (10K)</h6>
+                <div id="m-rasa" class="row g-2 mb-4"></div>
+                <h6 class="text-muted fw-bold">TOPPING (2K)</h6>
+                <div id="m-topping" class="row g-2"></div>
+            </div>
+
+            <div id="area-history" class="hidden">
+                <button class="btn btn-sm btn-secondary mb-3" onclick="backToKasir()">← Kembali ke Kasir</button>
+                <div class="card p-3">
+                    <h5>Penjualan Anda Hari Ini</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead><tr><th>Waktu</th><th>Total</th><th>Aksi</th></tr></thead>
+                            <tbody id="h-list"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="col-md-4 no-print">
-            <div class="card cart-card p-4 h-100 shadow">
-                <h5 class="fw-bold border-bottom pb-3"><i class="bi bi-cart3"></i> Detail Pesanan</h5>
-                
-                <div id="cart-list" style="min-height: 250px; max-height: 400px; overflow-y: auto;" class="my-3 pe-2">
-                    <p class="text-center text-muted mt-5 small">Keranjang masih kosong...</p>
+            <div class="card p-4">
+                <h5 class="fw-bold border-bottom pb-2">Pesanan <span id="lbl-user" class="badge bg-primary float-end"></span></h5>
+                <div id="cart-list" style="height: 300px; overflow-y: auto;" class="mb-3">
+                    <p class="text-center text-muted mt-5">Belum ada pesanan</p>
                 </div>
-
-                <div class="border-top pt-3">
-                    <div class="d-flex justify-content-between align-items-center mb-1 text-muted small">
-                        <span>Subtotal</span><span id="v-subtotal">0</span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center h3 fw-bold text-primary">
-                        <span>TOTAL</span><span id="v-total">0</span>
-                    </div>
+                <div class="d-flex justify-content-between h4 fw-bold text-primary border-top pt-2">
+                    <span>TOTAL</span><span id="v-total">0</span>
                 </div>
-
-                <div class="mt-4 bg-light p-3 rounded-3">
-                    <label class="small fw-bold mb-1">Diterima (Tunai)</label>
-                    <input type="number" id="v-cash" oninput="recalc()" class="form-control form-control-lg fw-bold" placeholder="0">
-                    <div class="d-flex justify-content-between mt-2 fw-bold text-danger">
+                <div class="mt-3">
+                    <input type="number" id="v-cash" oninput="calc()" class="form-control form-control-lg fw-bold" placeholder="Uang Bayar">
+                    <div class="d-flex justify-content-between mt-2 h5 text-danger fw-bold">
                         <span>Kembali:</span><span id="v-change">0</span>
                     </div>
                 </div>
-                
-                <button onclick="doPay()" id="b-pay" class="btn btn-success w-100 mt-4 btn-lg fw-bold py-3 shadow">PROSES PEMBAYARAN</button>
+                <button onclick="doPay()" id="btn-pay" class="btn btn-success w-100 mt-3 btn-lg fw-bold shadow">BAYAR & CETAK</button>
             </div>
         </div>
     </div>
 </div>
 
 <div id="p-admin" class="container py-4 hidden">
-    <div class="d-flex justify-content-between mb-4"><h3>Dashboard Admin</h3><button onclick="logout()" class="btn btn-danger">Logout</button></div>
-    <div id="admin-content" class="row">
-         <div class="col-12 mb-4"><div class="card p-3 shadow-sm border-0"><h5>Stok Bahan</h5><table class="table"><thead class="table-dark"><tr><th>Bahan</th><th>Sisa</th><th>Satuan</th></tr></thead><tbody id="t-stok"></tbody></table></div></div>
-         <div class="col-12"><div class="card p-3 shadow-sm border-0"><h5>Penjualan</h5><table class="table table-sm"><thead class="table-light"><tr><th>Waktu</th><th>Rincian</th><th>Total</th><th>Kasir</th></tr></thead><tbody id="t-sales"></tbody></table></div></div>
+    <div class="d-flex justify-content-between mb-4">
+        <h3>Admin Dashboard</h3>
+        <button onclick="logout()" class="btn btn-danger">Logout</button>
+    </div>
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card p-3">
+                <h5>Stok Bahan Baku</h5>
+                <table class="table"><thead class="table-dark"><tr><th>Bahan</th><th>Sisa</th><th>Satuan</th></tr></thead><tbody id="adm-stok"></tbody></table>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="card p-3">
+                <h5>Semua Penjualan</h5>
+                <table class="table table-sm"><thead class="table-light"><tr><th>Waktu</th><th>Kasir</th><th>Items</th><th>Total</th></tr></thead><tbody id="adm-sales"></tbody></table>
+            </div>
+        </div>
     </div>
 </div>
 
 <div id="receipt">
     <center><strong>YA!COOL DRINK</strong><br><small id="r-date"></small></center>
     <hr style="border-top: 1px dashed #000">
-    <div id="r-items" style="font-size: 12px;"></div>
+    <div id="r-items"></div>
     <hr style="border-top: 1px dashed #000">
-    <div style="display: flex; justify-content: space-between;"><span>Total</span><span id="r-total"></span></div>
-    <div style="display: flex; justify-content: space-between;"><span>Bayar</span><span id="r-cash"></span></div>
-    <div style="display: flex; justify-content: space-between; font-weight: bold;"><span>Kembali</span><span id="r-change"></span></div>
+    <div style="display:flex;justify-content:space-between"><span>Total</span><span id="r-total"></span></div>
+    <div style="display:flex;justify-content:space-between"><span>Bayar</span><span id="r-cash"></span></div>
+    <div style="display:flex;justify-content:space-between;font-weight:bold"><span>Kembali</span><span id="r-change"></span></div>
     <hr style="border-top: 1px dashed #000">
-    <center><small>Terima Kasih Atas Kunjungan Anda</small></center>
+    <center><small>Kasir: <span id="r-kasir"></span></small><br><strong>TERIMA KASIH</strong></center>
 </div>
 
 <script>
-    const API = "https://script.google.com/macros/s/AKfycbwu4P6aQaO8p9bHETvZ3_ietKRlaznDrQtzjXCH3MLJ-BqPC_22DQcp_ZsGtRIn4L-f5A/exec"; // <--- GANTI INI
+    const API = "https://script.google.com/macros/s/AKfycbwu4P6aQaO8p9bHETvZ3_ietKRlaznDrQtzjXCH3MLJ-BqPC_22DQcp_ZsGtRIn4L-f5A/exec"; // <--- GANTI INI DENGAN URL BARU!
     let cart = []; let user = "";
 
     async function doLogin() {
         const u = document.getElementById('u').value, p = document.getElementById('p').value;
-        if(!u || !p) return alert("Isi user & password!");
-        document.getElementById('b-login').innerText = "Memverifikasi...";
+        if(!u || !p) return alert("Isi Username/Password!");
+        document.getElementById('btn-login').innerText = "Loading...";
         try {
             const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'login', user: u, pass: p }) });
             const d = await r.json();
@@ -123,116 +134,133 @@
                 user = d.user;
                 document.getElementById('p-login').classList.add('hidden');
                 if (d.role === 'admin') { document.getElementById('p-admin').classList.remove('hidden'); loadAdmin(); }
-                else { document.getElementById('p-staff').classList.remove('hidden'); initMenu(); }
-            } else { alert("Login Gagal!"); document.getElementById('b-login').innerText = "MASUK SEKARANG"; }
-        } catch (e) { alert("Error Koneksi!"); document.getElementById('b-login').innerText = "MASUK SEKARANG"; }
-    }
-
-    // FUNGSI LOGOUT YANG SUDAH DIPERBAIKI
-    function logout() {
-        if(confirm("Apakah Anda yakin ingin keluar?")) {
-            // Bersihkan data
-            user = ""; cart = [];
-            // Sembunyikan semua halaman, munculkan login
-            document.getElementById('p-staff').classList.add('hidden');
-            document.getElementById('p-admin').classList.add('hidden');
-            document.getElementById('p-login').classList.remove('hidden');
-            document.getElementById('b-login').innerText = "MASUK SEKARANG";
-            document.getElementById('u').value = "";
-            document.getElementById('p').value = "";
-        }
+                else { document.getElementById('p-staff').classList.remove('hidden'); document.getElementById('lbl-user').innerText = user; initMenu(); }
+            } else { alert(d.msg || "Login Gagal!"); document.getElementById('btn-login').innerText = "MASUK"; }
+        } catch (e) { alert("Error: " + e.toString()); document.getElementById('btn-login').innerText = "MASUK"; }
     }
 
     function initMenu() {
-        const r = ["Original", "Mango", "Strawberry", "Lychee", "Grape", "Melon", "Choco", "Blueberry"];
-        const t = ["Boba", "Jelly", "Cheese", "Oreo", "Meses"];
+        const rasas = ["Original", "Mango", "Strawberry", "Lychee", "Grape", "Melon", "Choco", "Blueberry", "Nutrisari"];
+        const tops = ["Boba", "Jelly", "Cheese", "Oreo", "Meses"];
         document.getElementById('m-rasa').innerHTML = "";
         document.getElementById('m-topping').innerHTML = "";
-        r.forEach(x => document.getElementById('m-rasa').innerHTML += `<div class="col-6 col-md-3" onclick="add('${x}',10000,'Rasa')"><div class="btn-menu"><span>${x}</span><small class="text-primary fw-bold">10k</small></div></div>`);
-        t.forEach(y => document.getElementById('m-topping').innerHTML += `<div class="col-6 col-md-3" onclick="add('${y}',2000,'Topping')"><div class="btn-menu text-secondary"><span>${y}</span><small class="fw-bold">2k</small></div></div>`);
+        rasas.forEach(x => document.getElementById('m-rasa').innerHTML += `<div class="col-4 col-md-3" onclick="add('${x}',10000,'m')"><div class="btn-item"><b>${x}</b><small>10k</small></div></div>`);
+        tops.forEach(y => document.getElementById('m-topping').innerHTML += `<div class="col-4 col-md-3" onclick="add('${y}',2000,'t')"><div class="btn-item text-primary"><b>${y}</b><small>2k</small></div></div>`);
     }
 
-    function add(n, p, cat) { cart.push({ n, p, cat, id: Date.now() }); render(); }
-    function del(id) { cart = cart.filter(x => x.id !== id); render(); }
-    
-    function recalc() {
+    function add(n, p, t) { cart.push({ n, p, t, id: Date.now() }); renderCart(); }
+    function del(id) { cart = cart.filter(x => x.id !== id); renderCart(); }
+    function calc() {
         const tot = parseInt(document.getElementById('v-total').innerText.replace(/\D/g,'')) || 0;
-        const cash = parseInt(document.getElementById('v-cash').value) || 0;
-        const change = cash - tot;
-        document.getElementById('v-change').innerText = change >= 0 ? change.toLocaleString() : "0";
+        const csh = parseInt(document.getElementById('v-cash').value) || 0;
+        document.getElementById('v-change').innerText = (csh - tot).toLocaleString();
     }
 
-    // TAMPILAN RINCI KERANJANG
-    function render() {
+    function renderCart() {
         const list = document.getElementById('cart-list');
         let h = ""; let t = 0;
-        if(cart.length === 0) {
-            list.innerHTML = `<p class="text-center text-muted mt-5 small">Keranjang masih kosong...</p>`;
-            document.getElementById('v-total').innerText = "0";
-            document.getElementById('v-subtotal').innerText = "0";
-            return;
-        }
-        
-        cart.forEach((i, index) => {
-            h += `
-            <div class="cart-item d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center">
-                    <span class="badge bg-light text-dark me-2">${index + 1}</span>
-                    <div>
-                        <div class="fw-bold small">${i.n}</div>
-                        <small class="text-muted" style="font-size: 10px;">${i.cat}</small>
-                    </div>
-                </div>
-                <div class="text-end">
-                    <div class="small fw-bold">${i.p.toLocaleString()}</div>
-                    <i class="bi bi-x-circle text-danger ms-2" style="cursor:pointer" onclick="del(${i.id})"></i>
-                </div>
-            </div>`;
+        cart.forEach((i, idx) => {
+            h += `<div class="d-flex justify-content-between bg-light p-2 mb-1 rounded small">
+                    <span>${idx+1}. ${i.n}</span>
+                    <span>${i.p.toLocaleString()} <i class="bi bi-trash text-danger ms-2" style="cursor:pointer" onclick="del(${i.id})"></i></span>
+                  </div>`;
             t += i.p;
         });
-        list.innerHTML = h;
+        list.innerHTML = cart.length ? h : '<p class="text-center text-muted mt-5">Belum ada pesanan</p>';
         document.getElementById('v-total').innerText = t.toLocaleString();
-        document.getElementById('v-subtotal').innerText = t.toLocaleString();
-        recalc();
+        calc();
     }
 
     async function doPay() {
-        const tot = parseInt(document.getElementById('v-total').innerText.replace(/\D/g,''));
-        const cash = parseInt(document.getElementById('v-cash').value);
-        if (cart.length === 0) return alert("Keranjang masih kosong!");
-        if (isNaN(cash) || cash < tot) return alert("Uang tunai kurang!");
+    const tot = parseInt(document.getElementById('v-total').innerText.replace(/\D/g,''));
+    const cash = parseInt(document.getElementById('v-cash').value);
+    if(!cart.length || cash < tot) return alert("Cek Pesanan/Uang!");
 
-        const btn = document.getElementById('b-pay');
-        btn.disabled = true; btn.innerText = "Menyimpan Transaksi...";
+    document.getElementById('btn-pay').innerText = "Menyimpan...";
+    
+    // Payload untuk Database
+    const payload = {
+        action: 'transaction', 
+        items: cart.map(x => x.n).join(", "),
+        total: tot, cash, change: cash - tot, kasir: user,
+        itemCount: cart.filter(x => x.t === 'm').length
+    };
+
+    try {
+        await fetch(API, { method: 'POST', body: JSON.stringify(payload) });
         
-        const payload = {
-            action: 'transaction',
-            items: cart.map(x => x.n).join(", "),
-            total: tot, cash, change: cash - tot, kasir: user,
-            itemCount: cart.filter(x => x.cat === 'Rasa').length
-        };
+        // KIRIM DATA KERANJANG LENGKAP KE PRINT
+        printResi(cart, tot, cash, cash-tot, user); 
+        
+        alert("Berhasil!"); 
+        cart = []; renderCart(); 
+        document.getElementById('v-cash').value = "";
+    } catch (e) { alert("Gagal Simpan!"); }
+    finally { document.getElementById('btn-pay').innerText = "BAYAR & CETAK"; }
+}
 
-        try {
-            await fetch(API, { method: 'POST', body: JSON.stringify(payload) });
-            // Print Nota
-            document.getElementById('r-date').innerText = new Date().toLocaleString();
-            document.getElementById('r-items').innerHTML = cart.map(x => `<div style="display:flex; justify-content:space-between"><span>${x.n}</span><span>${x.p.toLocaleString()}</span></div>`).join('');
-            document.getElementById('r-total').innerText = tot.toLocaleString();
-            document.getElementById('r-cash').innerText = cash.toLocaleString();
-            document.getElementById('r-change').innerText = (cash - tot).toLocaleString();
-            window.print();
-            
-            alert("Transaksi Berhasil!"); 
-            cart = []; render(); document.getElementById('v-cash').value = "";
-        } catch (e) { alert("Gagal menyimpan data ke Google Sheets."); }
-        finally { btn.disabled = false; btn.innerText = "PROSES PEMBAYARAN"; }
+    function printResi(itemsArray, tot, cash, change, ksr) {
+    document.getElementById('r-date').innerText = new Date().toLocaleString();
+    
+    // Logika menampilkan rincian Nama + Harga
+    let htmlItems = "";
+    if (Array.isArray(itemsArray)) {
+        // Jika data berasal dari transaksi baru (berupa Array)
+        itemsArray.forEach(item => {
+            htmlItems += `<div style="display:flex; justify-content:space-between;">
+                            <span>${item.n}</span>
+                            <span>${item.p.toLocaleString()}</span>
+                          </div>`;
+        });
+    } else {
+        // Jika data berasal dari Reprint (berupa teks string dari database)
+        htmlItems = itemsArray.split(", ").map(x => `<div>${x}</div>`).join('');
+    }
+
+    document.getElementById('r-items').innerHTML = htmlItems;
+    document.getElementById('r-total').innerText = tot.toLocaleString();
+    document.getElementById('r-cash').innerText = cash.toLocaleString();
+    document.getElementById('r-change').innerText = change.toLocaleString();
+    document.getElementById('r-kasir').innerText = ksr;
+    window.print();
+}
+
+    async function showHistory() {
+        document.getElementById('area-kasir').classList.add('hidden');
+        document.getElementById('area-history').classList.remove('hidden');
+        const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData' }) });
+        const d = await r.json();
+        const my = d.sales.slice(1).filter(s => s[5] === user).reverse();
+        document.getElementById('h-list').innerHTML = my.map(s => `
+            <tr>
+                <td>${new Date(s[0]).toLocaleTimeString()}</td>
+                <td>${s[2].toLocaleString()}</td>
+                <td><button class="btn btn-sm btn-primary" onclick="printResi('${s[1]}',${s[2]},${s[3]},${s[4]},'${s[5]}')">Resi</button></td>
+            </tr>`).join('');
+    }
+
+    function backToKasir() {
+        document.getElementById('area-history').classList.add('hidden');
+        document.getElementById('area-kasir').classList.remove('hidden');
     }
 
     async function loadAdmin() {
-        const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getAdminData' }) });
+        const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData' }) });
         const d = await r.json();
-        document.getElementById('t-stok').innerHTML = d.stok.slice(1).map(s => `<tr><td>${s[0]}</td><td>${s[1]}</td><td>${s[2]}</td></tr>`).join('');
-        document.getElementById('t-sales').innerHTML = d.sales.slice(1).reverse().map(s => `<tr><td>${new Date(s[0]).toLocaleTimeString()}</td><td>${s[1]}</td><td>${s[2].toLocaleString()}</td><td>${s[5]}</td></tr>`).join('');
+        document.getElementById('adm-stok').innerHTML = d.stok.slice(1).map(s => `<tr><td>${s[0]}</td><td>${s[1]}</td><td>${s[2]}</td></tr>`).join('');
+        document.getElementById('adm-sales').innerHTML = d.sales.slice(1).reverse().map(s => `<tr><td>${new Date(s[0]).toLocaleTimeString()}</td><td>${s[5]}</td><td>${s[1]}</td><td>${s[2].toLocaleString()}</td></tr>`).join('');
+    }
+
+    function logout() { location.reload(); }
+    function logout() {
+        if(confirm("Logout?")) {
+            user = ""; cart = [];
+            document.getElementById('p-staff').classList.add('hidden');
+            document.getElementById('p-admin').classList.add('hidden');
+            document.getElementById('p-login').classList.remove('hidden');
+            document.getElementById('u').value = ""; document.getElementById('p').value = "";
+            document.getElementById('btn-login').innerText = "MASUK";
+        }
     }
 </script>
 </body>
