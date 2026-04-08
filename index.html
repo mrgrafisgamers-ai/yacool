@@ -215,33 +215,31 @@
 }
 
     function printResi(itemsArray, tot, cash, change, ksr) {
-    document.getElementById('r-date').innerText = new Date().toLocaleString();
-    
-    let htmlItems = "";
-    // Jika data adalah array (transaksi baru), tampilkan Nama + Harga
-    if (Array.isArray(itemsArray)) {
-        itemsArray.forEach(item => {
-            htmlItems += `
-            <div style="display:flex; justify-content:space-between; margin-bottom: 2px;">
-                <span>${item.n}</span>
-                <span>${item.p.toLocaleString()}</span>
-            </div>`;
-        });
+    // Cek apakah user menggunakan Android
+    const isAndroid = /Android/i.test(navigator.userAgent);
+
+    if (isAndroid) {
+        // Jika Android, langsung lempar ke aplikasi RawBT
+        sendToRawBT(itemsArray, tot, cash, change, ksr);
     } else {
-        // Jika data adalah string (reprint dari riwayat), tampilkan teks saja
-        htmlItems = itemsArray.split(", ").map(x => `<div>${x}</div>`).join('');
+        // Jika Laptop/PC, gunakan cara lama (window.print)
+        document.getElementById('r-date').innerText = new Date().toLocaleString();
+        let htmlItems = "";
+        if (Array.isArray(itemsArray)) {
+            itemsArray.forEach(item => {
+                htmlItems += `<div style="display:flex; justify-content:space-between;"><span>${item.n}</span><span>${item.p.toLocaleString()}</span></div>`;
+            });
+        } else {
+            htmlItems = itemsArray.split(", ").map(x => `<div>${x}</div>`).join('');
+        }
+        document.getElementById('r-items').innerHTML = htmlItems;
+        document.getElementById('r-total').innerText = tot.toLocaleString();
+        document.getElementById('r-cash').innerText = cash.toLocaleString();
+        document.getElementById('r-change').innerText = change.toLocaleString();
+        document.getElementById('r-kasir').innerText = ksr;
+        
+        setTimeout(() => { window.print(); }, 500);
     }
-
-    document.getElementById('r-items').innerHTML = htmlItems;
-    document.getElementById('r-total').innerText = tot.toLocaleString();
-    document.getElementById('r-cash').innerText = cash.toLocaleString();
-    document.getElementById('r-change').innerText = change.toLocaleString();
-    document.getElementById('r-kasir').innerText = ksr;
-
-    // Trigger Print
-    setTimeout(() => {
-        window.print();
-    }, 500);
 }
 
     async function showHistory() {
@@ -262,6 +260,36 @@
         document.getElementById('area-history').classList.add('hidden');
         document.getElementById('area-kasir').classList.remove('hidden');
     }
+
+function sendToRawBT(itemsArray, tot, cash, change, ksr) {
+    let t = "          YA!COOL DRINK\n";
+    t += "      " + new Date().toLocaleString() + "\n";
+    t += "--------------------------------\n";
+    
+    if (Array.isArray(itemsArray)) {
+        itemsArray.forEach(item => {
+            // Mengatur spasi agar nama di kiri dan harga di kanan pas (32 karakter)
+            let name = item.n.substring(0, 20);
+            let price = item.p.toLocaleString();
+            let space = 32 - (name.length + price.length);
+            t += name + " ".repeat(space > 0 ? space : 1) + price + "\n";
+        });
+    } else {
+        t += itemsArray + "\n";
+    }
+
+    t += "--------------------------------\n";
+    t += "Total:           " + tot.toLocaleString() + "\n";
+    t += "Bayar:           " + cash.toLocaleString() + "\n";
+    t += "Kembali:         " + change.toLocaleString() + "\n";
+    t += "--------------------------------\n";
+    t += "Kasir: " + ksr + "\n";
+    t += "\n      TERIMA KASIH\n\n\n\n";
+
+    // Memicu aplikasi RawBT di Android
+    let uri = "intent:#Intent;content=" + encodeURIComponent(t) + ";action=ru.a402nd.rawbtprinter.action.PRINT;category=android.intent.category.DEFAULT;type=text/plain;end;";
+    window.location.href = uri;
+}
 
     async function loadAdmin() {
         const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData' }) });
