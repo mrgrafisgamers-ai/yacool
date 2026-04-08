@@ -321,14 +321,25 @@
     t += "\n     Laporan Dicetak pada:\n";
     t += "     " + new Date().toLocaleString() + "\n\n\n\n";
 
-    const isAndroid = /Android/i.test(navigator.userAgent);
+    const isAndroid = /Android/i.test(navigator.userAgent) || /Linux/i.test(navigator.platform);
+
     if (isAndroid) {
+        // Skema Intent untuk RawBT
         const intent = "intent:#Intent;content=" + encodeURIComponent(t) + ";action=ru.a402nd.rawbtprinter.action.PRINT;category=android.intent.category.DEFAULT;type=text/plain;end;";
+        
+        // Gunakan metode Link Klik (lebih ampuh tembus blokir browser)
         const a = document.createElement('a');
         a.href = intent;
+        document.body.appendChild(a);
         a.click();
+        document.body.removeChild(a);
     } else {
-        alert("Gunakan HP Android untuk cetak langsung");
+        // Jika benar-benar pakai laptop, tampilkan preview cetak biasa
+        alert("Pesan dikirim ke printer sistem (Laptop)...");
+        const win = window.open('', 'PRINT', 'height=400,width=600');
+        win.document.write('<pre>' + t + '</pre>');
+        win.print();
+        win.close();
     }
 }
     async function showHistory() {
