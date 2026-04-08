@@ -13,7 +13,20 @@
         .btn-item { cursor: pointer; background: white; border: 1px solid #ddd; height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; transition: 0.2s; }
         .btn-item:hover { background: #e7f3ff; border-color: #007bff; transform: translateY(-3px); }
         #receipt { width: 80mm; padding: 5mm; display: none; font-family: monospace; background: white; }
-        @media print { .no-print { display: none; } #receipt { display: block !important; } }
+        @media print {
+    @page {
+        size: 58mm auto; /* Memaksa ukuran kertas thermal 58mm */
+        margin: 0;
+    }
+    .no-print { display: none !important; }
+    #receipt { 
+        display: block !important; 
+        width: 100% !important; 
+        margin: 0; 
+        padding: 5mm;
+        font-size: 14px; /* Sesuaikan ukuran font agar pas di kertas kecil */
+    }
+}
     </style>
 </head>
 <body>
@@ -176,9 +189,10 @@
     const cash = parseInt(document.getElementById('v-cash').value);
     if(!cart.length || cash < tot) return alert("Cek Pesanan/Uang!");
 
-    document.getElementById('btn-pay').innerText = "Menyimpan...";
-    
-    // Payload untuk Database
+    const btn = document.getElementById('btn-pay');
+    btn.innerText = "Menyimpan...";
+    btn.disabled = true;
+
     const payload = {
         action: 'transaction', 
         items: cart.map(x => x.n).join(", "),
@@ -188,32 +202,33 @@
 
     try {
         await fetch(API, { method: 'POST', body: JSON.stringify(payload) });
-        
-        // KIRIM DATA KERANJANG LENGKAP KE PRINT
+        // Mengirim data 'cart' lengkap (bukan cuma teks) agar harga muncul di struk
         printResi(cart, tot, cash, cash-tot, user); 
-        
         alert("Berhasil!"); 
         cart = []; renderCart(); 
         document.getElementById('v-cash').value = "";
     } catch (e) { alert("Gagal Simpan!"); }
-    finally { document.getElementById('btn-pay').innerText = "BAYAR & CETAK"; }
+    finally { 
+        btn.innerText = "BAYAR & CETAK"; 
+        btn.disabled = false;
+    }
 }
 
     function printResi(itemsArray, tot, cash, change, ksr) {
     document.getElementById('r-date').innerText = new Date().toLocaleString();
     
-    // Logika menampilkan rincian Nama + Harga
     let htmlItems = "";
+    // Jika data adalah array (transaksi baru), tampilkan Nama + Harga
     if (Array.isArray(itemsArray)) {
-        // Jika data berasal dari transaksi baru (berupa Array)
         itemsArray.forEach(item => {
-            htmlItems += `<div style="display:flex; justify-content:space-between;">
-                            <span>${item.n}</span>
-                            <span>${item.p.toLocaleString()}</span>
-                          </div>`;
+            htmlItems += `
+            <div style="display:flex; justify-content:space-between; margin-bottom: 2px;">
+                <span>${item.n}</span>
+                <span>${item.p.toLocaleString()}</span>
+            </div>`;
         });
     } else {
-        // Jika data berasal dari Reprint (berupa teks string dari database)
+        // Jika data adalah string (reprint dari riwayat), tampilkan teks saja
         htmlItems = itemsArray.split(", ").map(x => `<div>${x}</div>`).join('');
     }
 
@@ -222,7 +237,11 @@
     document.getElementById('r-cash').innerText = cash.toLocaleString();
     document.getElementById('r-change').innerText = change.toLocaleString();
     document.getElementById('r-kasir').innerText = ksr;
-    window.print();
+
+    // Trigger Print
+    setTimeout(() => {
+        window.print();
+    }, 500);
 }
 
     async function showHistory() {
