@@ -191,20 +191,19 @@
 }
 
     function printResi(items, tot, cash, chg, ksr) {
-    const isAndroid = /Android/i.test(navigator.userAgent);
-    
-    // KODE PERINTAH PRINTER (ESC/POS)
-    const boldOn = "\x1B\x45\x01";     // Mengaktifkan Bold
-    const boldOff = "\x1B\x45\x00";    // Mematikan Bold
-    const sizeBig = "\x1B\x21\x30";    // Font Besar (Double Height + Width)
-    const sizeNormal = "\x1B\x21\x00"; // Font Normal
-    const alignCenter = "\x1B\x61\x01"; // Rata Tengah
+    // Kode Perintah Printer (ESC/POS)
+    const init = "\x1B\x40";          // Reset printer
+    const boldOn = "\x1B\x45\x01";    // Tebal
+    const boldOff = "\x1B\x45\x00";   // Normal
+    const sizeBig = "\x1B\x21\x30";   // Besar
+    const sizeNormal = "\x1B\x21\x00";// Normal
+    const center = "\x1B\x61\x01";    // Rata Tengah
+    const left = "\x1B\x61\x00";      // Rata Kiri
 
-    let t = alignCenter + sizeBig + boldOn + "YA!COOL DRINK" + sizeNormal + "\n";
+    let t = init + center + sizeBig + boldOn + "YA!COOL DRINK" + sizeNormal + "\n";
     t += "  " + new Date().toLocaleString() + "\n";
-    t += "--------------------------------\n" + boldOff;
+    t += "--------------------------------\n" + left + boldOff;
     
-    // Rincian Item (Bold pada Nama Menu)
     if (Array.isArray(items)) {
         items.forEach(i => {
             let n = i.n.substring(0, 20);
@@ -224,23 +223,18 @@
     }
     
     t += "--------------------------------\n";
-    // Bagian Total dibuat Bold dan Besar
     t += boldOn + "TOTAL: " + sizeBig + tot.toLocaleString().padStart(12) + sizeNormal + "\n";
     t += "BAYAR: " + cash.toLocaleString().padStart(25) + "\n";
     t += "KEMBALI: " + chg.toLocaleString().padStart(23) + boldOff + "\n";
     t += "--------------------------------\n";
-    t += alignCenter + "Kasir: " + ksr + "\n\n      TERIMA KASIH\n\n\n\n\x1D\x56\x00"; // Potong kertas
+    t += center + "Kasir: " + ksr + "\n\n      TERIMA KASIH\n\n\n\n\n";
 
-    if (isAndroid) {
-        const intent = "intent:#Intent;content=" + encodeURIComponent(t) + ";action=ru.a402nd.rawbtprinter.action.PRINT;category=android.intent.category.DEFAULT;type=text/plain;end;";
-        const a = document.createElement('a');
-        a.href = intent;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    } else {
-        window.print();
-    }
+    // METODE KIRIM DATA AGAR TIDAK KOSONG
+    // Menggunakan Base64 agar karakter ESC/POS tidak hilang di jalan
+    const base64Data = btoa(unescape(encodeURIComponent(t)));
+    const intent = "intent:#Intent;content=" + encodeURIComponent(base64Data) + ";action=ru.a402nd.rawbtprinter.action.PRINT;category=android.intent.category.DEFAULT;type=application/base64;end;";
+    
+    window.location.href = intent;
 }
     async function loadAdminStats() {
     try {
