@@ -254,22 +254,26 @@
     async function loadAdminStats() {
     try {
         const filterInput = document.getElementById('admin-filter-date');
-        // Jika input kosong, default ke hari ini
         if (!filterInput.value) {
             filterInput.value = new Date().toISOString().split('T')[0];
         }
         
+        // Ambil data dari Sheets
         const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData' }) });
         const d = await r.json();
         
         let totO = 0, totC = 0;
-        // Format tanggal dari input untuk pencocokan (YYYY-MM-DD)
-        const targetDate = new Date(filterInput.value).toLocaleDateString('id-ID');
+        
+        // FORMAT ULANG TANGGAL INPUT (YYYY-MM-DD) agar sama dengan Google Sheets
+        const selDate = new Date(filterInput.value);
+        const targetDateString = selDate.toLocaleDateString('en-CA'); // Hasilnya pasti YYYY-MM-DD
 
         if (d.sales && d.sales.length > 1) {
             d.sales.slice(1).forEach(s => { 
-                const tglTransaksi = new Date(s[0]).toLocaleDateString('id-ID');
-                if (tglTransaksi === targetDate) {
+                // Format tanggal di kolom A Sheets
+                const tglSheet = new Date(s[0]).toLocaleDateString('en-CA');
+                
+                if (tglSheet === targetDateString) {
                     totO += parseInt(s[2]) || 0; 
                     totC += parseInt(s[6]) || 0; 
                 }
@@ -281,13 +285,12 @@
             d.stok.slice(1).forEach(row => { sData[row[0]] = row[1]; });
         }
 
-        // Update tampilan angka
+        // UPDATE TAMPILAN (Jika tidak ada data, otomatis jadi 0)
         document.getElementById('adm-omset').innerText = "Rp " + totO.toLocaleString();
         document.getElementById('adm-cups').innerText = totC + " Cup";
         document.getElementById('adm-stok-cup').innerText = (sData["Cup"] || 0) + " Pcs";
         document.getElementById('adm-profit').innerText = "Rp " + (totC * 2500).toLocaleString();
 
-        // Update daftar stok sisa
         let htmlStok = "";
         d.stok.slice(1).forEach(row => {
             let warna = row[1] < 10 ? 'text-danger' : 'text-dark'; 
@@ -295,16 +298,19 @@
         });
         document.getElementById('adm-detail-stok').innerHTML = htmlStok;
 
-    } catch (e) { alert("Gagal memuat data tanggal tersebut"); }
+    } catch (e) { alert("Koneksi gagal atau data kosong"); }
 }
     function printLaporan() {
-    // 1. Ambil Data dari Layar
     const tgl = document.getElementById('admin-filter-date').value || "Hari Ini";
     const oms = document.getElementById('adm-omset').innerText;
     const cup = document.getElementById('adm-cups').innerText;
     const prf = document.getElementById('adm-profit').innerText;
 
-    // 2. Susun Teks Struk
+    let detailStok = "";
+    document.querySelectorAll('#adm-detail-stok div').forEach(row => {
+        detailStok += row.innerText.replace("\n", ": ") + "\n";
+    });
+
     let t = "   LAPORAN PENJUALAN\n";
     t += "      YA!COOL DRINK\n";
     t += "--------------------------------\n";
@@ -314,35 +320,16 @@
     t += "TERJUAL : " + cup.padStart(18) + "\n";
     t += "PROFIT  : " + prf.padStart(18) + "\n";
     t += "--------------------------------\n";
-    t += "SISA STOK BAHAN:\n";
-
-    // Ambil detail stok dari elemen HTML
-    const rows = document.querySelectorAll('#adm-detail-stok div');
-    rows.forEach(row => {
-        // Membersihkan teks agar rapi saat dicetak
-        let teks = row.innerText.replace(/\n/g, ": ");
-        t += teks + "\n";
-    });
-
+    t += "SISA STOK BAHAN:\n" + detailStok;
     t += "--------------------------------\n";
-    t += "\n     Dicetak pada:\n";
-    t += "     " + new Date().toLocaleString() + "\n\n\n\n";
+    t += "\nDicetak: " + new Date().toLocaleString() + "\n\n\n\n";
 
-    // 3. Eksekusi Cetak (Metode Paling Ampuh untuk Chrome Android)
-    const intent = "intent:#Intent;content=" + encodeURIComponent(t) + ";action=ru.a402nd.rawbtprinter.action.PRINT;category=android.intent.category.DEFAULT;type=text/plain;end;";
+    // METODE PALING AMPUH: Gunakan URL Scheme 'rawbt:'
+    // Jika intent:// gagal, ini adalah cadangan terbaik
+    const rawbtUrl = "rawbt:base64," + btoa(unescape(encodeURIComponent(t)));
     
-    // Kita buat elemen 'a' (link) sementara, lalu klik secara paksa
-    const link = document.createElement('a');
-    link.href = intent;
-    
-    // Penting: Masukkan ke body sebentar agar Chrome yakin ini adalah klik valid
-    document.body.appendChild(link);
-    link.click();
-    
-    // Hapus lagi setelah diklik
-    setTimeout(() => {
-        document.body.removeChild(link);
-    }, 100);
+    // Eksekusi
+    window.location.href = rawbtUrl;
 }
     async function showHistory() {
     document.getElementById('area-kasir').classList.add('hidden');
