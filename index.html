@@ -12,21 +12,16 @@
         .card { border-radius: 15px; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
         .btn-item { cursor: pointer; background: white; border: 1px solid #ddd; height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; transition: 0.2s; }
         .btn-item:hover { background: #e7f3ff; border-color: #007bff; transform: translateY(-3px); }
-        #receipt { width: 80mm; padding: 5mm; display: none; font-family: monospace; background: white; }
+        
+        /* CSS KHUSUS CETAK */
+        #receipt { width: 58mm; padding: 2mm; display: none; font-family: 'Courier New', Courier, monospace; background: white; color: black; }
+        
         @media print {
-    @page {
-        size: 58mm auto; /* Memaksa ukuran kertas thermal 58mm */
-        margin: 0;
-    }
-    .no-print { display: none !important; }
-    #receipt { 
-        display: block !important; 
-        width: 100% !important; 
-        margin: 0; 
-        padding: 5mm;
-        font-size: 14px; /* Sesuaikan ukuran font agar pas di kertas kecil */
-    }
-}
+            @page { size: 58mm auto; margin: 0; }
+            body { margin: 0; padding: 0; }
+            .no-print { display: none !important; }
+            #receipt { display: block !important; width: 100% !important; margin: 0; padding: 5mm; font-size: 14px; }
+        }
     </style>
 </head>
 <body>
@@ -52,7 +47,7 @@
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="fw-bold"><i class="bi bi-shop"></i> POS Kasir</h4>
                 <div>
-                    <button class="btn btn-sm btn-info me-2" onclick="showHistory()"><i class="bi bi-clock-history"></i> Riwayat Hari Ini</button>
+                    <button class="btn btn-sm btn-info me-2" onclick="showHistory()"><i class="bi bi-clock-history"></i> Riwayat</button>
                     <button class="btn btn-sm btn-danger" onclick="logout()"><i class="bi bi-box-arrow-left"></i> Keluar</button>
                 </div>
             </div>
@@ -65,9 +60,8 @@
             </div>
 
             <div id="area-history" class="hidden">
-                <button class="btn btn-sm btn-secondary mb-3" onclick="backToKasir()">← Kembali ke Kasir</button>
+                <button class="btn btn-sm btn-secondary mb-3" onclick="backToKasir()">← Kembali</button>
                 <div class="card p-3">
-                    <h5>Penjualan Anda Hari Ini</h5>
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead><tr><th>Waktu</th><th>Total</th><th>Aksi</th></tr></thead>
@@ -81,9 +75,7 @@
         <div class="col-md-4 no-print">
             <div class="card p-4">
                 <h5 class="fw-bold border-bottom pb-2">Pesanan <span id="lbl-user" class="badge bg-primary float-end"></span></h5>
-                <div id="cart-list" style="height: 300px; overflow-y: auto;" class="mb-3">
-                    <p class="text-center text-muted mt-5">Belum ada pesanan</p>
-                </div>
+                <div id="cart-list" style="height: 300px; overflow-y: auto;" class="mb-3"></div>
                 <div class="d-flex justify-content-between h4 fw-bold text-primary border-top pt-2">
                     <span>TOTAL</span><span id="v-total">0</span>
                 </div>
@@ -94,27 +86,6 @@
                     </div>
                 </div>
                 <button onclick="doPay()" id="btn-pay" class="btn btn-success w-100 mt-3 btn-lg fw-bold shadow">BAYAR & CETAK</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="p-admin" class="container py-4 hidden">
-    <div class="d-flex justify-content-between mb-4">
-        <h3>Admin Dashboard</h3>
-        <button onclick="logout()" class="btn btn-danger">Logout</button>
-    </div>
-    <div class="row">
-        <div class="col-12 mb-4">
-            <div class="card p-3">
-                <h5>Stok Bahan Baku</h5>
-                <table class="table"><thead class="table-dark"><tr><th>Bahan</th><th>Sisa</th><th>Satuan</th></tr></thead><tbody id="adm-stok"></tbody></table>
-            </div>
-        </div>
-        <div class="col-12">
-            <div class="card p-3">
-                <h5>Semua Penjualan</h5>
-                <table class="table table-sm"><thead class="table-light"><tr><th>Waktu</th><th>Kasir</th><th>Items</th><th>Total</th></tr></thead><tbody id="adm-sales"></tbody></table>
             </div>
         </div>
     </div>
@@ -133,7 +104,8 @@
 </div>
 
 <script>
-    const API = "https://script.google.com/macros/s/AKfycbwu4P6aQaO8p9bHETvZ3_ietKRlaznDrQtzjXCH3MLJ-BqPC_22DQcp_ZsGtRIn4L-f5A/exec"; // <--- GANTI INI DENGAN URL BARU!
+    // URL Web App dari Google Apps Script
+    const API = "https://script.google.com/macros/s/AKfycbwu4P6aQaO8p9bHETvZ3_ietKRlaznDrQtzjXCH3MLJ-BqPC_22DQcp_ZsGtRIn4L-f5A/exec"; 
     let cart = []; let user = "";
 
     async function doLogin() {
@@ -146,101 +118,113 @@
             if (d.success) {
                 user = d.user;
                 document.getElementById('p-login').classList.add('hidden');
-                if (d.role === 'admin') { document.getElementById('p-admin').classList.remove('hidden'); loadAdmin(); }
-                else { document.getElementById('p-staff').classList.remove('hidden'); document.getElementById('lbl-user').innerText = user; initMenu(); }
-            } else { alert(d.msg || "Login Gagal!"); document.getElementById('btn-login').innerText = "MASUK"; }
-        } catch (e) { alert("Error: " + e.toString()); document.getElementById('btn-login').innerText = "MASUK"; }
+                document.getElementById('p-staff').classList.remove('hidden');
+                document.getElementById('lbl-user').innerText = user;
+                initMenu();
+            } else { alert("User atau Password salah!"); document.getElementById('btn-login').innerText = "MASUK"; }
+        } catch (e) { alert("Error koneksi!"); document.getElementById('btn-login').innerText = "MASUK"; }
     }
 
     function initMenu() {
         const rasas = ["Original", "Mango", "Strawberry", "Lychee", "Grape", "Melon", "Choco", "Blueberry", "Nutrisari"];
         const tops = ["Boba", "Jelly", "Cheese", "Oreo", "Meses"];
-        document.getElementById('m-rasa').innerHTML = "";
-        document.getElementById('m-topping').innerHTML = "";
-        rasas.forEach(x => document.getElementById('m-rasa').innerHTML += `<div class="col-4 col-md-3" onclick="add('${x}',10000,'m')"><div class="btn-item"><b>${x}</b><small>10k</small></div></div>`);
-        tops.forEach(y => document.getElementById('m-topping').innerHTML += `<div class="col-4 col-md-3" onclick="add('${y}',2000,'t')"><div class="btn-item text-primary"><b>${y}</b><small>2k</small></div></div>`);
+        document.getElementById('m-rasa').innerHTML = rasas.map(x => `<div class="col-4 col-md-3" onclick="add('${x}',10000,'m')"><div class="btn-item"><b>${x}</b><small>10k</small></div></div>`).join('');
+        document.getElementById('m-topping').innerHTML = tops.map(y => `<div class="col-4 col-md-3" onclick="add('${y}',2000,'t')"><div class="btn-item text-primary"><b>${y}</b><small>2k</small></div></div>`).join('');
     }
 
     function add(n, p, t) { cart.push({ n, p, t, id: Date.now() }); renderCart(); }
     function del(id) { cart = cart.filter(x => x.id !== id); renderCart(); }
+    
+    function renderCart() {
+        const list = document.getElementById('cart-list');
+        let t = 0;
+        list.innerHTML = cart.map(i => {
+            t += i.p;
+            return `<div class="d-flex justify-content-between bg-light p-2 mb-1 rounded small">
+                <span>${i.n}</span>
+                <span>${i.p.toLocaleString()} <i class="bi bi-trash text-danger ms-2" onclick="del(${i.id})"></i></span>
+            </div>`;
+        }).join('');
+        document.getElementById('v-total').innerText = t.toLocaleString();
+        calc();
+    }
+
     function calc() {
         const tot = parseInt(document.getElementById('v-total').innerText.replace(/\D/g,'')) || 0;
         const csh = parseInt(document.getElementById('v-cash').value) || 0;
         document.getElementById('v-change').innerText = (csh - tot).toLocaleString();
     }
 
-    function renderCart() {
-        const list = document.getElementById('cart-list');
-        let h = ""; let t = 0;
-        cart.forEach((i, idx) => {
-            h += `<div class="d-flex justify-content-between bg-light p-2 mb-1 rounded small">
-                    <span>${idx+1}. ${i.n}</span>
-                    <span>${i.p.toLocaleString()} <i class="bi bi-trash text-danger ms-2" style="cursor:pointer" onclick="del(${i.id})"></i></span>
-                  </div>`;
-            t += i.p;
-        });
-        list.innerHTML = cart.length ? h : '<p class="text-center text-muted mt-5">Belum ada pesanan</p>';
-        document.getElementById('v-total').innerText = t.toLocaleString();
-        calc();
-    }
-
     async function doPay() {
-    const tot = parseInt(document.getElementById('v-total').innerText.replace(/\D/g,''));
-    const cash = parseInt(document.getElementById('v-cash').value);
-    if(!cart.length || cash < tot) return alert("Cek Pesanan/Uang!");
+        const tot = parseInt(document.getElementById('v-total').innerText.replace(/\D/g,''));
+        const cash = parseInt(document.getElementById('v-cash').value);
+        if(!cart.length || cash < tot) return alert("Cek Pesanan/Uang!");
 
-    const btn = document.getElementById('btn-pay');
-    btn.innerText = "Menyimpan...";
-    btn.disabled = true;
+        const btn = document.getElementById('btn-pay');
+        btn.innerText = "Proses..."; btn.disabled = true;
 
-    const payload = {
-        action: 'transaction', 
-        items: cart.map(x => x.n).join(", "),
-        total: tot, cash, change: cash - tot, kasir: user,
-        itemCount: cart.filter(x => x.t === 'm').length
-    };
+        const payload = {
+            action: 'transaction', items: cart.map(x => x.n).join(", "),
+            total: tot, cash, change: cash - tot, kasir: user,
+            itemCount: cart.filter(x => x.t === 'm').length
+        };
 
-    try {
-        await fetch(API, { method: 'POST', body: JSON.stringify(payload) });
-        // Mengirim data 'cart' lengkap (bukan cuma teks) agar harga muncul di struk
-        printResi(cart, tot, cash, cash-tot, user); 
-        alert("Berhasil!"); 
-        cart = []; renderCart(); 
-        document.getElementById('v-cash').value = "";
-    } catch (e) { alert("Gagal Simpan!"); }
-    finally { 
-        btn.innerText = "BAYAR & CETAK"; 
-        btn.disabled = false;
+        try {
+            await fetch(API, { method: 'POST', body: JSON.stringify(payload) });
+            printResi(cart, tot, cash, cash-tot, user);
+            alert("Transaksi Berhasil!");
+            cart = []; renderCart(); document.getElementById('v-cash').value = "";
+        } catch (e) { alert("Gagal Simpan!"); }
+        finally { btn.innerText = "BAYAR & CETAK"; btn.disabled = false; }
     }
-}
 
     function printResi(itemsArray, tot, cash, change, ksr) {
-    // Cek apakah user menggunakan Android
-    const isAndroid = /Android/i.test(navigator.userAgent);
+        const isAndroid = /Android/i.test(navigator.userAgent);
+        if (isAndroid) {
+            sendToRawBT(itemsArray, tot, cash, change, ksr);
+        } else {
+            document.getElementById('r-date').innerText = new Date().toLocaleString();
+            let htmlItems = "";
+            if (Array.isArray(itemsArray)) {
+                itemsArray.forEach(item => {
+                    htmlItems += `<div style="display:flex; justify-content:space-between;"><span>${item.n}</span><span>${item.p.toLocaleString()}</span></div>`;
+                });
+            } else {
+                htmlItems = itemsArray.split(", ").map(x => `<div style="border-bottom:1px dashed #eee;">${x}</div>`).join('');
+            }
+            document.getElementById('r-items').innerHTML = htmlItems;
+            document.getElementById('r-total').innerText = tot.toLocaleString();
+            document.getElementById('r-cash').innerText = cash.toLocaleString();
+            document.getElementById('r-change').innerText = change.toLocaleString();
+            document.getElementById('r-kasir').innerText = ksr;
+            window.print();
+        }
+    }
 
-    if (isAndroid) {
-        // Jika Android, langsung lempar ke aplikasi RawBT
-        sendToRawBT(itemsArray, tot, cash, change, ksr);
-    } else {
-        // Jika Laptop/PC, gunakan cara lama (window.print)
-        document.getElementById('r-date').innerText = new Date().toLocaleString();
-        let htmlItems = "";
+    function sendToRawBT(itemsArray, tot, cash, change, ksr) {
+        let t = "      YA!COOL DRINK\n";
+        t += "  " + new Date().toLocaleString() + "\n";
+        t += "--------------------------------\n";
         if (Array.isArray(itemsArray)) {
             itemsArray.forEach(item => {
-                htmlItems += `<div style="display:flex; justify-content:space-between;"><span>${item.n}</span><span>${item.p.toLocaleString()}</span></div>`;
+                let n = item.n.substring(0, 20);
+                let p = item.p.toLocaleString();
+                let s = 32 - (n.length + p.length);
+                t += n + " ".repeat(s > 0 ? s : 1) + p + "\n";
             });
         } else {
-            htmlItems = itemsArray.split(", ").map(x => `<div>${x}</div>`).join('');
+            t += itemsArray.split(", ").join("\n") + "\n";
         }
-        document.getElementById('r-items').innerHTML = htmlItems;
-        document.getElementById('r-total').innerText = tot.toLocaleString();
-        document.getElementById('r-cash').innerText = cash.toLocaleString();
-        document.getElementById('r-change').innerText = change.toLocaleString();
-        document.getElementById('r-kasir').innerText = ksr;
-        
-        setTimeout(() => { window.print(); }, 500);
+        t += "--------------------------------\n";
+        t += "Total:           " + tot.toLocaleString() + "\n";
+        t += "Bayar:           " + cash.toLocaleString() + "\n";
+        t += "Kembali:         " + change.toLocaleString() + "\n";
+        t += "--------------------------------\n";
+        t += "Kasir: " + ksr + "\n\n      TERIMA KASIH\n\n\n\n";
+
+        let uri = "intent:#Intent;content=" + encodeURIComponent(t) + ";action=ru.a402nd.rawbtprinter.action.PRINT;category=android.intent.category.DEFAULT;type=text/plain;end;";
+        window.location.href = uri;
     }
-}
 
     async function showHistory() {
         document.getElementById('area-kasir').classList.add('hidden');
@@ -252,7 +236,7 @@
             <tr>
                 <td>${new Date(s[0]).toLocaleTimeString()}</td>
                 <td>${s[2].toLocaleString()}</td>
-                <td><button class="btn btn-sm btn-primary" onclick="printResi('${s[1]}',${s[2]},${s[3]},${s[4]},'${s[5]}')">Resi</button></td>
+                <td><button class="btn btn-sm btn-primary" onclick="printResi('${s[1]}',${s[2]},${s[3]},${s[4]},'${s[5]}')">Cetak</button></td>
             </tr>`).join('');
     }
 
@@ -261,54 +245,7 @@
         document.getElementById('area-kasir').classList.remove('hidden');
     }
 
-function sendToRawBT(itemsArray, tot, cash, change, ksr) {
-    let t = "          YA!COOL DRINK\n";
-    t += "      " + new Date().toLocaleString() + "\n";
-    t += "--------------------------------\n";
-    
-    if (Array.isArray(itemsArray)) {
-        itemsArray.forEach(item => {
-            // Mengatur spasi agar nama di kiri dan harga di kanan pas (32 karakter)
-            let name = item.n.substring(0, 20);
-            let price = item.p.toLocaleString();
-            let space = 32 - (name.length + price.length);
-            t += name + " ".repeat(space > 0 ? space : 1) + price + "\n";
-        });
-    } else {
-        t += itemsArray + "\n";
-    }
-
-    t += "--------------------------------\n";
-    t += "Total:           " + tot.toLocaleString() + "\n";
-    t += "Bayar:           " + cash.toLocaleString() + "\n";
-    t += "Kembali:         " + change.toLocaleString() + "\n";
-    t += "--------------------------------\n";
-    t += "Kasir: " + ksr + "\n";
-    t += "\n      TERIMA KASIH\n\n\n\n";
-
-    // Memicu aplikasi RawBT di Android
-    let uri = "intent:#Intent;content=" + encodeURIComponent(t) + ";action=ru.a402nd.rawbtprinter.action.PRINT;category=android.intent.category.DEFAULT;type=text/plain;end;";
-    window.location.href = uri;
-}
-
-    async function loadAdmin() {
-        const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData' }) });
-        const d = await r.json();
-        document.getElementById('adm-stok').innerHTML = d.stok.slice(1).map(s => `<tr><td>${s[0]}</td><td>${s[1]}</td><td>${s[2]}</td></tr>`).join('');
-        document.getElementById('adm-sales').innerHTML = d.sales.slice(1).reverse().map(s => `<tr><td>${new Date(s[0]).toLocaleTimeString()}</td><td>${s[5]}</td><td>${s[1]}</td><td>${s[2].toLocaleString()}</td></tr>`).join('');
-    }
-
-    function logout() { location.reload(); }
-    function logout() {
-        if(confirm("Logout?")) {
-            user = ""; cart = [];
-            document.getElementById('p-staff').classList.add('hidden');
-            document.getElementById('p-admin').classList.add('hidden');
-            document.getElementById('p-login').classList.remove('hidden');
-            document.getElementById('u').value = ""; document.getElementById('p').value = "";
-            document.getElementById('btn-login').innerText = "MASUK";
-        }
-    }
+    function logout() { if(confirm("Keluar?")) location.reload(); }
 </script>
 </body>
 </html>
