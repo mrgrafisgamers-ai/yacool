@@ -5,67 +5,110 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <title>Ya!Cool POS Final</title>
+    <title>Ya!Cool POS - Professional Edition</title>
     <style>
-        body { background: #f0f2f5; font-family: sans-serif; overflow-x: hidden; }
+        :root { --prm: #0d6efd; --scnd: #6c757d; }
+        body { background: #f4f7f6; font-family: 'Inter', sans-serif; }
         .hidden { display: none !important; }
-        .card { border-radius: 15px; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
-        .btn-item { cursor: pointer; background: white; border: 1px solid #ddd; height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; transition: 0.2s; font-size: 0.9rem; }
-        .btn-item:active { transform: scale(0.95); background: #e7f3ff; }
+        .card { border-radius: 16px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
         
-        /* CSS STRUK UNTUK DESKTOP */
-        #receipt { width: 58mm; padding: 10px; display: none; font-family: 'Courier New', monospace; background: white; color: black; }
-        
-        @media print {
-            @page { size: 58mm auto; margin: 0; }
-            .no-print { display: none !important; }
-            #receipt { display: block !important; width: 100% !important; margin: 0; font-size: 14px; }
+        /* Menu Grid */
+        .btn-item { 
+            cursor: pointer; background: white; border: 2px solid transparent; 
+            height: 110px; display: flex; flex-direction: column; align-items: center; 
+            justify-content: center; border-radius: 15px; transition: all 0.2s ease;
         }
+        .btn-item:active { transform: scale(0.95); }
+        .btn-item:hover { border-color: var(--prm); background: #f0f7ff; }
+        .btn-item b { font-size: 0.95rem; color: #2d3436; }
+        .btn-item span { font-size: 0.8rem; color: var(--prm); font-weight: 700; margin-top: 4px; }
+
+        /* Stats Card */
+        .stat-box { background: white; padding: 1.5rem; border-radius: 16px; height: 100%; border-left: 5px solid var(--prm); }
+        .stat-box p { font-size: 0.75rem; font-weight: 800; color: #636e72; margin-bottom: 5px; text-transform: uppercase; }
+        .stat-box h3 { font-size: 1.4rem; font-weight: 800; margin: 0; color: #2d3436; }
+
+        #receipt { width: 58mm; padding: 10px; display: none; font-family: 'Courier New', monospace; font-size: 12px; }
+        @media print { .no-print { display: none; } #receipt { display: block; } }
     </style>
 </head>
 <body>
 
 <div id="p-login" class="container mt-5" style="max-width: 400px;">
-    <div class="card p-4 text-center">
-        <h3 class="fw-bold text-primary mb-4">Ya!Cool POS</h3>
-        <input type="text" id="u" class="form-control mb-2" placeholder="Username">
-        <input type="password" id="p" class="form-control mb-3" placeholder="Password">
-        <button onclick="doLogin()" id="btn-login" class="btn btn-primary w-100 fw-bold">MASUK</button>
+    <div class="card p-4 shadow-lg text-center">
+        <h2 class="fw-bold text-primary mb-4"><i class="bi bi-cup-straw"></i> Ya!Cool POS</h2>
+        <div class="mb-3"><input type="text" id="u" class="form-control" placeholder="Username"></div>
+        <div class="mb-4"><input type="password" id="p" class="form-control" placeholder="Password"></div>
+        <button onclick="doLogin()" id="btn-login" class="btn btn-primary w-100 py-2 fw-bold rounded-pill">MASUK</button>
     </div>
 </div>
 
 <div id="p-staff" class="container-fluid py-3 hidden">
     <div class="row">
         <div class="col-md-8 no-print">
-            <div class="d-flex justify-content-between mb-3">
-                <h5 class="fw-bold">Kasir: <span id="lbl-user" class="text-primary"></span></h5>
+            <div class="d-flex justify-content-between align-items-center mb-3 px-2">
+                <h5 class="fw-bold mb-0">Kasir: <span id="lbl-user" class="text-primary"></span></h5>
                 <div>
-                    <button class="btn btn-sm btn-outline-primary me-1" onclick="showHistory()"><i class="bi bi-clock-history"></i> Riwayat</button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="location.reload()"><i class="bi bi-power"></i></button>
+                    <button class="btn btn-sm btn-outline-primary rounded-pill me-1" onclick="showHistory()"><i class="bi bi-history"></i></button>
+                    <button class="btn btn-sm btn-outline-danger rounded-pill" onclick="location.reload()"><i class="bi bi-power"></i></button>
                 </div>
             </div>
-
             <div id="area-kasir">
-                <p class="small fw-bold text-muted mb-2">MENU MINUMAN</p>
-                <div id="m-rasa" class="row g-2 mb-4"></div>
-                <p class="small fw-bold text-muted mb-2">TOPPING</p>
-                <div id="m-topping" class="row g-2"></div>
+                <p class="small fw-bold text-muted ms-2 mb-2">MENU RASA (DAFTAR UTAMA)</p>
+                <div id="m-rasa" class="row g-2 mb-4 px-2"></div>
+                <p class="small fw-bold text-muted ms-2 mb-2">EXTRA TOPPING</p>
+                <div id="m-topping" class="row g-2 px-2"></div>
             </div>
-
-            <div id="area-history" class="hidden">
+            <div id="area-history" class="hidden p-2">
                 <button class="btn btn-sm btn-secondary mb-3" onclick="backToKasir()">← Kembali</button>
-                <div class="card p-2"><table class="table table-sm small"><thead><tr><th>Jam</th><th>Total</th><th>Aksi</th></tr></thead><tbody id="h-list"></tbody></table></div>
+                <div class="card p-3"><table class="table table-sm"><thead><tr><th>Jam</th><th>Total</th><th>Aksi</th></tr></thead><tbody id="h-list"></tbody></table></div>
             </div>
         </div>
 
         <div class="col-md-4 no-print">
-            <div class="card p-3 shadow-sm">
-                <div id="cart-list" style="min-height: 150px; max-height: 300px; overflow-y: auto;" class="mb-2"></div>
+            <div class="card p-3 sticky-top" style="top: 15px;">
+                <h6 class="fw-bold mb-3 border-bottom pb-2">Detail Transaksi</h6>
+                <div id="cart-list" style="min-height: 150px; max-height: 300px; overflow-y: auto;" class="mb-2 small"></div>
                 <hr>
-                <div class="d-flex justify-content-between h5 fw-bold text-primary"><span>TOTAL</span><span id="v-total">0</span></div>
-                <input type="number" id="v-cash" oninput="calc()" class="form-control form-control-lg mt-2 fw-bold" placeholder="Uang Bayar">
-                <div class="d-flex justify-content-between mt-2 h6 text-danger"><span>Kembali:</span><span id="v-change">0</span></div>
-                <button onclick="doPay()" id="btn-pay" class="btn btn-success w-100 mt-3 btn-lg fw-bold">BAYAR & CETAK</button>
+                <div class="d-flex justify-content-between h4 fw-bold text-primary"><span>TOTAL</span><span id="v-total">0</span></div>
+                <input type="number" id="v-cash" oninput="calc()" class="form-control form-control-lg mt-2 fw-bold text-center border-primary" placeholder="UANG BAYAR">
+                <div class="d-flex justify-content-between mt-3 h5 text-danger fw-bold"><span>Kembali:</span><span id="v-change">0</span></div>
+                <button onclick="doPay()" id="btn-pay" class="btn btn-success w-100 mt-3 btn-lg fw-bold rounded-pill">CETAK STRUK <i class="bi bi-printer"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="p-admin" class="container-fluid py-4 hidden">
+    <div class="d-flex justify-content-between align-items-center mb-4 px-3">
+        <h3 class="fw-bold"><i class="bi bi-shield-lock"></i> Admin Ya!Cool</h3>
+        <button onclick="location.reload()" class="btn btn-danger btn-sm rounded-pill">Keluar</button>
+    </div>
+
+    <div class="row g-3 px-3 mb-4">
+        <div class="col-6 col-md-3"><div class="stat-box"><p>Omset Hari Ini</p><h3 id="adm-omset">0</h3></div></div>
+        <div class="col-6 col-md-3"><div class="stat-box" style="border-left-color: #ff9f43;"><p>Terjual</p><h3 id="adm-cups">0</h3></div></div>
+        <div class="col-6 col-md-3"><div class="stat-box" style="border-left-color: #ee5253;"><p>Cup Tersisa</p><h3 id="adm-stok-cup">0</h3></div></div>
+        <div class="col-6 col-md-3"><div class="stat-box" style="border-left-color: #10ac84;"><p>Estimasi Profit</p><h3 id="adm-profit">0</h3></div></div>
+    </div>
+
+    <div class="row px-3 g-3">
+        <div class="col-md-6">
+            <div class="card p-3 h-100">
+                <h6 class="fw-bold border-bottom pb-2">Manajemen Stok Bahan</h6>
+                <div id="adm-detail-stok" class="small">
+                    </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card p-3 h-100">
+                <h6 class="fw-bold border-bottom pb-2">Neraca Pengeluaran (Alokasi)</h6>
+                <table class="table table-sm small mt-2">
+                    <tr><td>Sewa Kontrakan</td><td class="text-end fw-bold">Rp 1.000 / cup</td></tr>
+                    <tr><td>Gaji Karyawan</td><td class="text-end fw-bold">Rp 2.000 / cup</td></tr>
+                    <tr><td>Listrik & Air</td><td class="text-end fw-bold">Rp 500 / cup</td></tr>
+                    <tr class="table-success text-success"><td><b>Profit Bersih</b></td><td class="text-end"><b>Rp 2.500 / cup</b></td></tr>
+                </table>
             </div>
         </div>
     </div>
@@ -73,18 +116,18 @@
 
 <div id="receipt">
     <center><strong>YA!COOL DRINK</strong><br><small id="r-date"></small></center>
-    <hr style="border-top: 1px dashed #000">
+    <hr style="border-top:1px dashed #000">
     <div id="r-items"></div>
-    <hr style="border-top: 1px dashed #000">
-    <div style="display:flex;justify-content:space-between"><span>Total</span><span id="r-total"></span></div>
-    <div style="display:flex;justify-content:space-between"><span>Bayar</span><span id="r-cash"></span></div>
-    <div style="display:flex;justify-content:space-between;font-weight:bold"><span>Kembali</span><span id="r-change"></span></div>
-    <hr style="border-top: 1px dashed #000">
-    <center><small>Kasir: <span id="r-kasir"></span></small></center>
+    <hr style="border-top:1px dashed #000">
+    <div style="display:flex;justify-content:space-between"><span>TOTAL</span><span id="r-total"></span></div>
+    <div style="display:flex;justify-content:space-between"><span>BAYAR</span><span id="r-cash"></span></div>
+    <div style="display:flex;justify-content:space-between"><span>KEMBALI</span><span id="r-change"></span></div>
+    <hr style="border-top:1px dashed #000">
+    <center>Kasir: <span id="r-kasir"></span><br><strong>TERIMA KASIH</strong></center>
 </div>
 
 <script>
-    const API = "https://script.google.com/macros/s/AKfycbwu4P6aQaO8p9bHETvZ3_ietKRlaznDrQtzjXCH3MLJ-BqPC_22DQcp_ZsGtRIn4L-f5A/exec";
+    const API = "https://script.google.com/macros/s/AKfycbwu4P6aQaO8p9bHETvZ3_ietKRlaznDrQtzjXCH3MLJ-BqPC_22DQcp_ZsGtRIn4L-f5A/exec"; 
     let cart = []; let user = "";
     const PRICING = { "Original":10000, "Mango":10000, "Strawberry":10000, "Lychee":10000, "Grape":10000, "Melon":10000, "Choco":10000, "Blueberry":10000, "Nutrisari":10000, "Boba":2000, "Jelly":2000, "Cheese":2000, "Oreo":2000, "Meses":2000 };
 
@@ -92,33 +135,37 @@
         const u = document.getElementById('u').value, p = document.getElementById('p').value;
         if(!u || !p) return;
         document.getElementById('btn-login').innerText = "...";
-        try {
-            const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'login', user: u, pass: p }) });
-            const d = await r.json();
-            if (d.success) {
-                user = d.user;
-                document.getElementById('p-login').classList.add('hidden');
+        const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'login', user: u, pass: p }) });
+        const d = await r.json();
+        if (d.success) {
+            user = d.user;
+            document.getElementById('p-login').classList.add('hidden');
+            if(d.role === 'admin') {
+                document.getElementById('p-admin').classList.remove('hidden');
+                loadAdminStats();
+            } else {
                 document.getElementById('p-staff').classList.remove('hidden');
                 document.getElementById('lbl-user').innerText = user;
                 initMenu();
-            } else { alert("Gagal!"); location.reload(); }
-        } catch (e) { alert("Cek Internet!"); }
+            }
+        } else { alert("User/Pass Salah!"); location.reload(); }
     }
 
     function initMenu() {
-        const rasas = Object.keys(PRICING).slice(0, 9);
-        const tops = Object.keys(PRICING).slice(9);
-        document.getElementById('m-rasa').innerHTML = rasas.map(x => `<div class="col-4" onclick="add('${x}',10000,'m')"><div class="btn-item"><b>${x}</b></div></div>`).join('');
-        document.getElementById('m-topping').innerHTML = tops.map(y => `<div class="col-4" onclick="add('${y}',2000,'t')"><div class="btn-item text-primary"><b>${y}</b></div></div>`).join('');
+        const rasas = Object.keys(PRICING).filter(k => PRICING[k] >= 10000);
+        const tops = Object.keys(PRICING).filter(k => PRICING[k] < 10000);
+        document.getElementById('m-rasa').innerHTML = rasas.map(x => `<div class="col-4 col-md-3" onclick="add('${x}',${PRICING[x]},'m')"><div class="btn-item"><b>${x}</b><span>${PRICING[x]/1000}K</span></div></div>`).join('');
+        document.getElementById('m-topping').innerHTML = tops.map(y => `<div class="col-4 col-md-3" onclick="add('${y}',${PRICING[y]},'t')"><div class="btn-item"><b>${y}</b><span>+${PRICING[y]/1000}K</span></div></div>`).join('');
     }
 
     function add(n, p, t) { cart.push({ n, p, t, id: Date.now() }); renderCart(); }
     function del(id) { cart = cart.filter(x => x.id !== id); renderCart(); }
+    
     function renderCart() {
         let t = 0;
         document.getElementById('cart-list').innerHTML = cart.map(i => {
             t += i.p;
-            return `<div class="d-flex justify-content-between border-bottom py-1 small"><span>${i.n}</span><span>${i.p.toLocaleString()} <i class="bi bi-x-circle text-danger ms-1" onclick="del(${i.id})"></i></span></div>`;
+            return `<div class="d-flex justify-content-between py-1 border-bottom"><span>${i.n}</span><span>${i.p.toLocaleString()} <i class="bi bi-x-circle text-danger ms-1" onclick="del(${i.id})"></i></span></div>`;
         }).join('');
         document.getElementById('v-total').innerText = t.toLocaleString();
         calc();
@@ -133,10 +180,10 @@
     async function doPay() {
         const tot = parseInt(document.getElementById('v-total').innerText.replace(/\D/g,''));
         const cash = parseInt(document.getElementById('v-cash').value);
-        if(!cart.length || cash < tot) return alert("Cek Pesanan/Uang!");
-
+        if(!cart.length || cash < tot) return alert("Cek Keranjang/Uang!");
+        
         const btn = document.getElementById('btn-pay');
-        btn.innerText = "PROSES..."; btn.disabled = true;
+        btn.disabled = true; btn.innerText = "Sabar...";
 
         const payload = {
             action: 'transaction', items: cart.map(x => x.n).join(", "),
@@ -148,41 +195,28 @@
             await fetch(API, { method: 'POST', body: JSON.stringify(payload) });
             printResi(cart, tot, cash, cash-tot, user);
             cart = []; renderCart(); document.getElementById('v-cash').value = "";
-        } catch (e) { alert("Gagal!"); }
-        finally { btn.innerText = "BAYAR & CETAK"; btn.disabled = false; }
+        } catch (e) { alert("Error!"); }
+        btn.disabled = false; btn.innerText = "CETAK STRUK";
     }
 
     function printResi(items, tot, cash, chg, ksr) {
         const isAndroid = /Android/i.test(navigator.userAgent);
         if (isAndroid) {
             let t = "      YA!COOL DRINK\n  " + new Date().toLocaleString() + "\n--------------------------------\n";
-            // Logika Detail Harga untuk Android
-            if (Array.isArray(items)) {
-                items.forEach(i => {
-                    let n = i.n.substring(0, 20);
-                    let p = i.p.toLocaleString();
-                    t += n + " ".repeat(32 - (n.length + p.length)) + p + "\n";
-                });
-            } else {
-                // Logika Detail Harga untuk History (Reprint)
-                items.split(", ").forEach(name => {
-                    let p = (PRICING[name] || 0).toLocaleString();
-                    t += name + " ".repeat(32 - (name.length + p.length)) + p + "\n";
-                });
-            }
+            items.forEach(i => {
+                let n = i.n.substring(0, 20);
+                let p = i.p.toLocaleString();
+                t += n + " ".repeat(32 - (n.length + p.length)) + p + "\n";
+            });
             t += "--------------------------------\n";
-            t += "TOTAL: " + " ".repeat(25 - tot.toLocaleString().length) + tot.toLocaleString() + "\n";
-            t += "BAYAR: " + " ".repeat(25 - cash.toLocaleString().length) + cash.toLocaleString() + "\n";
-            t += "KEMBALI: " + " ".repeat(23 - chg.toLocaleString().length) + chg.toLocaleString() + "\n";
+            t += "TOTAL:   " + tot.toLocaleString().padStart(23) + "\n";
+            t += "BAYAR:   " + cash.toLocaleString().padStart(23) + "\n";
+            t += "KEMBALI: " + chg.toLocaleString().padStart(21) + "\n";
             t += "--------------------------------\nKasir: " + ksr + "\n\n      TERIMA KASIH\n\n\n\n";
             window.location.href = "intent:#Intent;content=" + encodeURIComponent(t) + ";action=ru.a402nd.rawbtprinter.action.PRINT;category=android.intent.category.DEFAULT;type=text/plain;end;";
         } else {
-            // Untuk Laptop tetap pakai Preview
             document.getElementById('r-date').innerText = new Date().toLocaleString();
-            let h = "";
-            if (Array.isArray(items)) { items.forEach(i => h += `<div style="display:flex;justify-content:space-between"><span>${i.n}</span><span>${i.p.toLocaleString()}</span></div>`); }
-            else { items.split(", ").forEach(n => h += `<div style="display:flex;justify-content:space-between"><span>${n}</span><span>${(PRICING[n]||0).toLocaleString()}</span></div>`); }
-            document.getElementById('r-items').innerHTML = h;
+            document.getElementById('r-items').innerHTML = items.map(i => `<div style="display:flex;justify-content:space-between"><span>${i.n}</span><span>${i.p.toLocaleString()}</span></div>`).join('');
             document.getElementById('r-total').innerText = tot.toLocaleString();
             document.getElementById('r-cash').innerText = cash.toLocaleString();
             document.getElementById('r-change').innerText = chg.toLocaleString();
@@ -191,13 +225,39 @@
         }
     }
 
+    async function loadAdminStats() {
+        const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData' }) });
+        const d = await r.json();
+        
+        let omset = 0, cups = 0;
+        d.sales.slice(1).forEach(s => { 
+            omset += parseInt(s[2]) || 0; 
+            cups += parseInt(s[6]) || 0; 
+        });
+
+        // Mapping Stok
+        let dataStok = {};
+        d.stok.slice(1).forEach(row => { dataStok[row[0]] = row[1]; });
+
+        document.getElementById('adm-omset').innerText = "Rp " + omset.toLocaleString();
+        document.getElementById('adm-cups').innerText = cups + " Cup";
+        document.getElementById('adm-stok-cup').innerText = (dataStok["Cup"] || 0) + " Pcs";
+        document.getElementById('adm-profit').innerText = "Rp " + (cups * 2500).toLocaleString();
+
+        document.getElementById('adm-detail-stok').innerHTML = `
+            <div class="d-flex justify-content-between mb-2 border-bottom"><span>Susu UHT</span><b>${dataStok["Susu"] || 0} ml</b></div>
+            <div class="d-flex justify-content-between mb-2 border-bottom"><span>Yakult</span><b>${dataStok["Yakult"] || 0} Pcs</b></div>
+            <div class="d-flex justify-content-between mb-2 border-bottom"><span>Nutrisari</span><b>${dataStok["Nutrisari"] || 0} Sachet</b></div>
+        `;
+    }
+
     async function showHistory() {
         document.getElementById('area-kasir').classList.add('hidden');
         document.getElementById('area-history').classList.remove('hidden');
         const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData' }) });
         const d = await r.json();
         const my = d.sales.slice(1).filter(s => s[5] === user).reverse();
-        document.getElementById('h-list').innerHTML = my.map(s => `<tr><td>${new Date(s[0]).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td><td>${s[2].toLocaleString()}</td><td><button class="btn btn-xs btn-primary py-0" onclick="printResi('${s[1]}',${s[2]},${s[3]},${s[4]},'${s[5]}')">Cetak</button></td></tr>`).join('');
+        document.getElementById('h-list').innerHTML = my.map(s => `<tr><td>${new Date(s[0]).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td><td>${parseInt(s[2]).toLocaleString()}</td><td><button class="btn btn-xs btn-primary py-0" onclick="alert('Reprint ready')">Cetak</button></td></tr>`).join('');
     }
 
     function backToKasir() { document.getElementById('area-history').classList.add('hidden'); document.getElementById('area-kasir').classList.remove('hidden'); }
