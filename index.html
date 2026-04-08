@@ -232,9 +232,20 @@
     // METODE KIRIM DATA AGAR TIDAK KOSONG
     // Menggunakan Base64 agar karakter ESC/POS tidak hilang di jalan
     const base64Data = btoa(unescape(encodeURIComponent(t)));
-    const intent = "intent:#Intent;content=" + encodeURIComponent(base64Data) + ";action=ru.a402nd.rawbtprinter.action.PRINT;category=android.intent.category.DEFAULT;type=application/base64;end;";
-    
-    window.location.href = intent;
+const intent = "intent:#Intent;content=" + encodeURIComponent(base64Data) + ";action=ru.a402nd.rawbtprinter.action.PRINT;category=android.intent.category.DEFAULT;type=application/base64;end;";
+
+// JANGAN gunakan window.location.href saja
+// TAPI buat elemen link nyata dan klik secara paksa
+const link = document.createElement('a');
+link.href = intent;
+link.rel = "noreferrer"; // Menambah keamanan agar Chrome tidak curiga
+document.body.appendChild(link);
+link.click();
+
+// Hapus link setelah 1/2 detik
+setTimeout(() => {
+    document.body.removeChild(link);
+}, 500);
 }
     async function loadAdminStats() {
     try {
