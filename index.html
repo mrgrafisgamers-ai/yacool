@@ -298,11 +298,13 @@
     } catch (e) { alert("Gagal memuat data tanggal tersebut"); }
 }
     function printLaporan() {
-    const tgl = document.getElementById('admin-filter-date').value;
+    // 1. Ambil Data dari Layar
+    const tgl = document.getElementById('admin-filter-date').value || "Hari Ini";
     const oms = document.getElementById('adm-omset').innerText;
     const cup = document.getElementById('adm-cups').innerText;
     const prf = document.getElementById('adm-profit').innerText;
 
+    // 2. Susun Teks Struk
     let t = "   LAPORAN PENJUALAN\n";
     t += "      YA!COOL DRINK\n";
     t += "--------------------------------\n";
@@ -312,35 +314,35 @@
     t += "TERJUAL : " + cup.padStart(18) + "\n";
     t += "PROFIT  : " + prf.padStart(18) + "\n";
     t += "--------------------------------\n";
-    t += "SISA STOK BAHAN UTAMA:\n";
-    
-    // Ambil data stok yang tampil di layar admin
-    const listStok = document.getElementById('adm-detail-stok').innerText;
-    t += listStok + "\n";
+    t += "SISA STOK BAHAN:\n";
+
+    // Ambil detail stok dari elemen HTML
+    const rows = document.querySelectorAll('#adm-detail-stok div');
+    rows.forEach(row => {
+        // Membersihkan teks agar rapi saat dicetak
+        let teks = row.innerText.replace(/\n/g, ": ");
+        t += teks + "\n";
+    });
+
     t += "--------------------------------\n";
-    t += "\n     Laporan Dicetak pada:\n";
+    t += "\n     Dicetak pada:\n";
     t += "     " + new Date().toLocaleString() + "\n\n\n\n";
 
-    const isAndroid = /Android/i.test(navigator.userAgent) || /Linux/i.test(navigator.platform);
-
-    if (isAndroid) {
-        // Skema Intent untuk RawBT
-        const intent = "intent:#Intent;content=" + encodeURIComponent(t) + ";action=ru.a402nd.rawbtprinter.action.PRINT;category=android.intent.category.DEFAULT;type=text/plain;end;";
-        
-        // Gunakan metode Link Klik (lebih ampuh tembus blokir browser)
-        const a = document.createElement('a');
-        a.href = intent;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    } else {
-        // Jika benar-benar pakai laptop, tampilkan preview cetak biasa
-        alert("Pesan dikirim ke printer sistem (Laptop)...");
-        const win = window.open('', 'PRINT', 'height=400,width=600');
-        win.document.write('<pre>' + t + '</pre>');
-        win.print();
-        win.close();
-    }
+    // 3. Eksekusi Cetak (Metode Paling Ampuh untuk Chrome Android)
+    const intent = "intent:#Intent;content=" + encodeURIComponent(t) + ";action=ru.a402nd.rawbtprinter.action.PRINT;category=android.intent.category.DEFAULT;type=text/plain;end;";
+    
+    // Kita buat elemen 'a' (link) sementara, lalu klik secara paksa
+    const link = document.createElement('a');
+    link.href = intent;
+    
+    // Penting: Masukkan ke body sebentar agar Chrome yakin ini adalah klik valid
+    document.body.appendChild(link);
+    link.click();
+    
+    // Hapus lagi setelah diklik
+    setTimeout(() => {
+        document.body.removeChild(link);
+    }, 100);
 }
     async function showHistory() {
     document.getElementById('area-kasir').classList.add('hidden');
