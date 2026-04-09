@@ -10,8 +10,10 @@
         body { background: #f0f2f5; font-family: sans-serif; }
         .hidden { display: none !important; }
         .card { border-radius: 15px; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
-        .btn-item { cursor: pointer; background: white; border: 1px solid #ddd; height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; transition: 0.2s; font-size: 0.85rem; }
-        .btn-item:active { transform: scale(0.95); background: #e7f3ff; }
+        .list-group-item { cursor: pointer; transition: 0.2s; border-left: 5px solid transparent; }
+        .list-group-item:hover { background: #e7f3ff; border-left: 5px solid #0d6efd; }
+        .qty-control { display: flex; align-items: center; gap: 8px; }
+        .qty-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid #ddd; background: white; font-weight: bold; }
         .stat-card { background: white; padding: 15px; border-radius: 12px; text-align: center; border-bottom: 4px solid #0d6efd; }
         #receipt { width: 58mm; padding: 10px; display: none; font-family: 'Courier New', monospace; font-size: 12px; }
         @media print { .no-print { display: none; } #receipt { display: block; } }
@@ -20,7 +22,7 @@
 <body>
 
 <div id="p-login" class="container mt-5" style="max-width: 400px;">
-    <div class="card p-4 text-center">
+    <div class="card p-4 text-center shadow">
         <h3 class="fw-bold text-primary mb-4">Ya!Cool POS</h3>
         <input type="text" id="u" class="form-control mb-2" placeholder="Username">
         <input type="password" id="p" class="form-control mb-3" placeholder="Password">
@@ -30,86 +32,79 @@
 
 <div id="p-staff" class="container-fluid py-3 hidden">
     <div class="row">
-        <div class="col-md-8 no-print">
-            <div class="d-flex justify-content-between mb-3">
-                <h5 class="fw-bold">Kasir: <span id="lbl-user" class="text-primary"></span></h5>
+        <div class="col-md-7 no-print">
+            <div class="d-flex justify-content-between mb-3 align-items-center">
+                <h5 class="fw-bold m-0 text-dark">Kasir: <span id="lbl-user" class="text-primary"></span></h5>
                 <div>
                     <button class="btn btn-sm btn-outline-primary" onclick="showHistory()"><i class="bi bi-clock-history"></i></button>
                     <button class="btn btn-sm btn-outline-danger" onclick="location.reload()"><i class="bi bi-power"></i></button>
                 </div>
             </div>
-            <div id="area-kasir">
-                <p class="small fw-bold text-muted mb-2">MENU MINUMAN</p>
-                <div id="m-rasa" class="row g-2 mb-4"></div>
-                <p class="small fw-bold text-muted mb-2">TOPPING</p>
-                <div id="m-topping" class="row g-2"></div>
+            <div id="area-kasir" class="card p-3 shadow-sm">
+                <p class="small fw-bold text-muted mb-2 border-bottom pb-1">MENU & TOPPING</p>
+                <div id="m-list" class="list-group list-group-flush" style="max-height: 65vh; overflow-y: auto;"></div>
             </div>
             <div id="area-history" class="hidden">
                 <button class="btn btn-sm btn-secondary mb-3" onclick="backToKasir()">← Kembali</button>
-                <div class="card p-2"><table class="table table-sm small"><thead><tr><th>Jam</th><th>Total</th><th>Aksi</th></tr></thead><tbody id="h-list"></tbody></table></div>
+                <div class="card p-2 shadow-sm"><table class="table table-sm small"><thead><tr><th>Jam</th><th>Total</th><th>Aksi</th></tr></thead><tbody id="h-list"></tbody></table></div>
             </div>
         </div>
-        <div class="col-md-4 no-print">
-            <div class="card p-3 shadow-sm">
-                <div id="cart-list" style="min-height: 150px; max-height: 300px; overflow-y: auto;" class="mb-2"></div>
-                <hr>
-                <div class="d-flex justify-content-between h4 fw-bold text-primary"><span>TOTAL</span><span id="v-total">0</span></div>
-                <input type="number" id="v-cash" oninput="calc()" class="form-control form-control-lg mt-2 fw-bold" placeholder="Uang Bayar">
-                <div class="d-flex justify-content-between mt-2 h6 text-danger fw-bold"><span>Kembali:</span><span id="v-change">0</span></div>
-                <button onclick="doPay()" id="btn-pay" class="btn btn-success w-100 mt-3 btn-lg fw-bold">BAYAR & CETAK</button>
+        <div class="col-md-5 no-print">
+            <div class="card p-3 shadow border-0" style="position: sticky; top: 10px;">
+                <h6 class="fw-bold"><i class="bi bi-cart"></i> Detail Pesanan</h6>
+                <div id="cart-list" style="min-height: 100px; max-height: 200px; overflow-y: auto;" class="mb-2 border-bottom"></div>
+                <div class="d-flex justify-content-between h4 fw-bold text-primary mt-2"><span>TOTAL</span><span id="v-total">0</span></div>
+                <div class="mt-3">
+                    <label class="small fw-bold">Uang Bayar (Cash)</label>
+                    <input type="number" id="v-cash" oninput="calc()" class="form-control form-control-lg fw-bold text-success" placeholder="0">
+                </div>
+                <div class="d-flex justify-content-between mt-2 h5 text-danger fw-bold bg-light p-2 rounded"><span>Kembali:</span><span id="v-change">0</span></div>
+                <button onclick="doPay()" id="btn-pay" class="btn btn-success w-100 mt-3 btn-lg fw-bold shadow">BAYAR & CETAK</button>
             </div>
         </div>
     </div>
 </div>
 
 <div id="p-admin" class="container py-4 hidden">
-    <div class="d-flex justify-content-between mb-4">
-        <h3 class="fw-bold">Admin Panel</h3>
-        <button onclick="location.reload()" class="btn btn-danger btn-sm">Keluar</button>
+    <div class="d-flex justify-content-between mb-4 align-items-center">
+        <h3 class="fw-bold text-dark m-0">Admin Panel</h3>
+        <button onclick="location.reload()" class="btn btn-danger btn-sm shadow-sm">Logout</button>
     </div>
-    <div class="card p-3 mb-4 shadow-sm">
-        <label class="small fw-bold mb-1">Lihat Laporan Tanggal:</label>
+    
+    <div class="card p-3 mb-4 shadow-sm border-0 bg-white">
+        <label class="small fw-bold mb-2">Laporan Tanggal:</label>
         <div class="input-group">
             <input type="date" id="admin-filter-date" class="form-control">
-            <button class="btn btn-primary" onclick="loadAdminStats()"><i class="bi bi-search"></i></button>
-            <button class="btn btn-success" onclick="printLaporan()"><i class="bi bi-printer"></i> Cetak</button>
+            <button class="btn btn-primary px-3" onclick="loadAdminStats()"><i class="bi bi-search"></i> Tarik Data</button>
+            <button class="btn btn-success px-3" onclick="printLaporanAdmin()"><i class="bi bi-printer"></i> Cetak Laporan</button>
         </div>
     </div>
+
     <div class="row g-3 mb-4">
-        <div class="col-6 col-md-3"><div class="stat-card"><p class="small text-muted mb-1">OMSET</p><h4 id="adm-omset">0</h4></div></div>
-        <div class="col-6 col-md-3"><div class="stat-card"><p class="small text-muted mb-1">TERJUAL</p><h4 id="adm-cups">0</h4></div></div>
-        <div class="col-6 col-md-3"><div class="stat-card"><p class="small text-muted mb-1">STOK CUP</p><h4 id="adm-stok-cup">0</h4></div></div>
-        <div class="col-6 col-md-3"><div class="stat-card"><p class="small text-muted mb-1">PROFIT</p><h4 id="adm-profit">0</h4></div></div>
+        <div class="col-6 col-md-3"><div class="stat-card"><p class="small text-muted mb-1">OMSET</p><h4 id="adm-omset" class="fw-bold text-primary">0</h4></div></div>
+        <div class="col-6 col-md-3"><div class="stat-card"><p class="small text-muted mb-1">CUP TERJUAL</p><h4 id="adm-cups" class="fw-bold text-success">0</h4></div></div>
+        <div class="col-6 col-md-3"><div class="stat-card"><p class="small text-muted mb-1">SISA STOK CUP</p><h4 id="adm-stok-cup" class="fw-bold text-warning">0</h4></div></div>
+        <div class="col-6 col-md-3"><div class="stat-card"><p class="small text-muted mb-1">EST. PROFIT</p><h4 id="adm-profit" class="fw-bold text-danger">0</h4></div></div>
     </div>
-    <div class="card p-3">
-        <h6 class="fw-bold border-bottom pb-2">Detail Bahan Baku</h6>
-        <div id="adm-detail-stok" class="small mt-2"></div>
+
+    <div class="card p-3 shadow-sm border-0">
+        <h6 class="fw-bold border-bottom pb-2 text-secondary"><i class="bi bi-box-seam me-1"></i> Detail Sisa Stok Bahan</h6>
+        <div id="adm-detail-stok" class="small mt-2">
+            </div>
     </div>
 </div>
 
-<div id="receipt">
-    <center><strong>YA!COOL DRINK</strong><br><small id="r-date"></small></center>
-    <hr style="border-top: 1px dashed #000">
-    <div id="r-items"></div>
-    <hr style="border-top: 1px dashed #000">
-    <div style="display:flex;justify-content:space-between"><span>Total</span><span id="r-total"></span></div>
-    <div style="display:flex;justify-content:space-between"><span>Bayar</span><span id="r-cash"></span></div>
-    <div style="display:flex;justify-content:space-between;font-weight:bold"><span>Kembali</span><span id="r-change"></span></div>
-    <hr style="border-top: 1px dashed #000">
-    <center><small>Kasir: <span id="r-kasir"></span></small></center>
-</div>
+<div id="receipt"></div>
 
 <script>
-    // GANTI DENGAN URL WEB APP ANDA
     const API = "https://script.google.com/macros/s/AKfycbz7Qdsnze_d0vAC460hUWOxRbEvgIDea_4RSvT8etHf7BCu9FKJASIqjRaLFtahd3Q/exec"; 
-    
     let cart = []; let user = "";
-        const PRICING = { "Nanas":10000, "Mangga":10000, "Strawberry":10000, "Anggur":10000, "Semangka":10000, "Melon":10000, "Jeruk":10000, "Apel":10000, "Belimbing":10000, "Boba":2000, "Jelly":2000, "Cheese":2000, "Oreo":2000, "Meses":2000 };
+    const PRICING = { "Nanas":10000, "Mangga":10000, "Strawberry":10000, "Anggur":10000, "Semangka":10000, "Melon":10000, "Jeruk":10000, "Apel":10000, "Belimbing":10000, "Boba":2000, "Jelly":2000, "Cheese":2000, "Oreo":2000, "Meses":2000 };
 
     async function doLogin() {
         const u = document.getElementById('u').value, p = document.getElementById('p').value;
         if(!u || !p) return;
-        document.getElementById('btn-login').innerText = "...";
+        document.getElementById('btn-login').innerText = "Authenticating...";
         try {
             const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'login', user: u, pass: p }) });
             const d = await r.json();
@@ -118,32 +113,47 @@
                 document.getElementById('p-login').classList.add('hidden');
                 if(d.role === 'admin') {
                     document.getElementById('p-admin').classList.remove('hidden');
+                    // Set default date to today for admin
+                    document.getElementById('admin-filter-date').valueAsDate = new Date();
                     loadAdminStats();
                 } else {
                     document.getElementById('p-staff').classList.remove('hidden');
                     document.getElementById('lbl-user').innerText = user;
                     initMenu();
                 }
-            } else { alert("Gagal!"); location.reload(); }
-        } catch (e) { alert("Error Koneksi!"); location.reload(); }
+            } else { alert("User/Pass Salah!"); location.reload(); }
+        } catch (e) { alert("Error Koneksi API! Pastikan Script dideploy as Anyone."); location.reload(); }
     }
 
     function initMenu() {
-        const rasas = Object.keys(PRICING).slice(0, 9);
-        const tops = Object.keys(PRICING).slice(9);
-        document.getElementById('m-rasa').innerHTML = rasas.map(x => `<div class="col-4" onclick="add('${x}',10000,'m')"><div class="btn-item"><b>${x}</b></div></div>`).join('');
-        document.getElementById('m-topping').innerHTML = tops.map(y => `<div class="col-4" onclick="add('${y}',2000,'t')"><div class="btn-item text-primary"><b>${y}</b></div></div>`).join('');
+        const list = document.getElementById('m-list');
+        list.innerHTML = Object.entries(PRICING).map(([name, price]) => `
+            <div class="list-group-item d-flex justify-content-between align-items-center py-3">
+                <div><div class="fw-bold">${name}</div><small class="text-muted">Rp ${price.toLocaleString()}</small></div>
+                <div class="qty-control">
+                    <button class="qty-btn" onclick="updateQty('${name}', ${price}, -1)">-</button>
+                    <span id="q-${name.replace(/\s/g,'')}" class="fw-bold mx-2">0</span>
+                    <button class="qty-btn bg-primary text-white border-0" onclick="updateQty('${name}', ${price}, 1)">+</button>
+                </div>
+            </div>`).join('');
     }
 
-    function add(n, p, t) { cart.push({ n, p, t, id: Date.now() }); renderCart(); }
-    function del(id) { cart = cart.filter(x => x.id !== id); renderCart(); }
-    
+    function updateQty(n, p, c) {
+        const lbl = document.getElementById(`q-${n.replace(/\s/g,'')}`);
+        let cur = parseInt(lbl.innerText);
+        if(cur + c < 0) return;
+        lbl.innerText = cur + c;
+        if(c > 0) cart.push({ n, p, id: Date.now() + Math.random() });
+        else { const idx = cart.findLastIndex(x => x.n === n); if(idx !== -1) cart.splice(idx, 1); }
+        renderCart();
+    }
+
     function renderCart() {
         let t = 0;
-        document.getElementById('cart-list').innerHTML = cart.map(i => {
-            t += i.p;
-            return `<div class="d-flex justify-content-between border-bottom py-1 small"><span>${i.n}</span><span>${i.p.toLocaleString()} <i class="bi bi-x-circle text-danger ms-1" onclick="del(${i.id})"></i></span></div>`;
-        }).join('');
+        const group = cart.reduce((a, b) => { a[b.n] = (a[b.n] || 0) + 1; t += b.p; return a; }, {});
+        document.getElementById('cart-list').innerHTML = Object.entries(group).map(([n, q]) => `
+            <div class="d-flex justify-content-between small py-1"><span>${q}x ${n}</span><span class="fw-bold">Rp ${(q*PRICING[n]).toLocaleString()}</span></div>
+        `).join('') || '<p class="text-center text-muted small mt-2">Kosong</p>';
         document.getElementById('v-total').innerText = t.toLocaleString();
         calc();
     }
@@ -154,173 +164,98 @@
         document.getElementById('v-change').innerText = (csh - tot).toLocaleString();
     }
 
-    async function doPay() {
-    const tot = parseInt(document.getElementById('v-total').innerText.replace(/\D/g,''));
-    const cash = parseInt(document.getElementById('v-cash').value);
-    if(!cart.length || cash < tot) return alert("Cek Pesanan!");
-
-    const btn = document.getElementById('btn-pay');
-    btn.innerText = "PROSES..."; btn.disabled = true;
-
-    // Simpan salinan keranjang untuk dicetak nanti
-    const itemsToPrint = [...cart]; 
-    const payload = {
-        action: 'transaction', 
-        items: itemsToPrint.map(x => x.n).join(", "),
-        total: tot, 
-        cash: cash, 
-        change: cash - tot, 
-        kasir: user,
-        itemCount: itemsToPrint.filter(x => x.t === 'm').length
-    };
-
-    try {
-        await fetch(API, { method: 'POST', body: JSON.stringify(payload) });
-        // Kirim data keranjang yang utuh ke fungsi cetak
-        printResi(itemsToPrint, tot, cash, cash-tot, user);
-        cart = []; 
-        renderCart(); 
-        document.getElementById('v-cash').value = "";
-    } catch (e) { 
-        alert("Gagal Simpan ke Sheets, tapi mencoba cetak..."); 
-        printResi(itemsToPrint, tot, cash, cash-tot, user);
-    } finally { 
-        btn.innerText = "BAYAR & CETAK"; 
-        btn.disabled = false; 
-    }
-}
-
-    function printResi(items, tot, cash, chg, ksr) {
-    const isAndroid = /Android/i.test(navigator.userAgent);
-    let t = "      YA!COOL DRINK\n";
-    t += "  " + new Date().toLocaleString() + "\n";
-    t += "--------------------------------\n";
+    async function loadAdminStats() {
+    const tgl = document.getElementById('admin-filter-date').value;
+    if(!tgl) return alert("Pilih Tanggal!");
     
-    if (Array.isArray(items)) {
-        // JIKA CETAK DARI KASIR (Data Array Lengkap)
-        items.forEach(i => {
-            let n = i.n.substring(0, 20);
-            let p = i.p.toLocaleString();
-            let s = 32 - (n.length + p.length);
-            t += n + " ".repeat(s > 0 ? s : 1) + p + "\n";
-        });
-    } else {
-        // JIKA CETAK DARI HISTORY (Data Teks Koma)
-        const itemArray = items.split(", ");
-        itemArray.forEach(name => {
-            let n = name.trim().substring(0, 20);
-            // TRIK: Ambil harga dari daftar PRICING berdasarkan nama menu
-            let hrg = PRICING[name.trim()] || 0; 
-            let p = hrg > 0 ? hrg.toLocaleString() : "...";
-            
-            let s = 32 - (n.length + p.length);
-            t += n + " ".repeat(s > 0 ? s : 1) + p + "\n";
-        });
-    }
-    
-    t += "--------------------------------\n";
-    t += "TOTAL: " + tot.toLocaleString().padStart(25) + "\n";
-    t += "BAYAR: " + cash.toLocaleString().padStart(25) + "\n";
-    t += "KEMBALI: " + chg.toLocaleString().padStart(23) + "\n";
-    t += "--------------------------------\nKasir: " + ksr + "\n\n      TERIMA KASIH\n\n\n\n";
-
-    if (isAndroid) {
-        const intent = "intent:#Intent;content=" + encodeURIComponent(t) + ";action=ru.a402nd.rawbtprinter.action.PRINT;category=android.intent.category.DEFAULT;type=text/plain;end;";
-        const a = document.createElement('a');
-        a.href = intent;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    } else {
-        // Tampilan untuk Preview Web (Laptop)
-        document.getElementById('r-date').innerText = new Date().toLocaleString();
-        let listHtml = "";
-        if(Array.isArray(items)) {
-            listHtml = items.map(i => `<div style="display:flex;justify-content:space-between"><span>${i.n}</span><span>${i.p.toLocaleString()}</span></div>`).join('');
-        } else {
-            listHtml = items.split(", ").map(n => {
-                let h = PRICING[n.trim()] || 0;
-                return `<div style="display:flex;justify-content:space-between"><span>${n.trim()}</span><span>${h.toLocaleString()}</span></div>`;
-            }).join('');
-        }
-        document.getElementById('r-items').innerHTML = listHtml;
-        document.getElementById('r-total').innerText = tot.toLocaleString();
-        document.getElementById('r-cash').innerText = cash.toLocaleString();
-        document.getElementById('r-change').innerText = chg.toLocaleString();
-        document.getElementById('r-kasir').innerText = ksr;
-        window.print();
-    }
-}
-
-    function printLaporan() {
-    const tgl = document.getElementById('admin-filter-date').value || "Hari Ini";
-    const oms = document.getElementById('adm-omset').innerText;
-    const cup = document.getElementById('adm-cups').innerText;
-    const prf = document.getElementById('adm-profit').innerText;
-
-    let detailStok = "";
-    document.querySelectorAll('#adm-detail-stok div').forEach(row => {
-        detailStok += row.innerText.replace("\n", ": ") + "\n";
-    });
-
-    let t = "   LAPORAN PENJUALAN\n";
-    t += "      YA!COOL DRINK\n";
-    t += "--------------------------------\n";
-    t += "Tanggal : " + tgl + "\n";
-    t += "--------------------------------\n";
-    t += "OMSET   : " + oms.padStart(18) + "\n";
-    t += "TERJUAL : " + cup.padStart(18) + "\n";
-    t += "PROFIT  : " + prf.padStart(18) + "\n";
-    t += "--------------------------------\n";
-    t += "SISA STOK BAHAN:\n" + detailStok;
-    t += "--------------------------------\n";
-    t += "\nDicetak: " + new Date().toLocaleString() + "\n\n\n\n";
-
-    // METODE PALING AMPUH: Gunakan URL Scheme 'rawbt:'
-    // Jika intent:// gagal, ini adalah cadangan terbaik
-    const rawbtUrl = "rawbt:base64," + btoa(unescape(encodeURIComponent(t)));
-    
-    // Eksekusi
-    window.location.href = rawbtUrl;
-}
-    async function showHistory() {
-    document.getElementById('area-kasir').classList.add('hidden');
-    document.getElementById('area-history').classList.remove('hidden');
-    
+    document.getElementById('adm-omset').innerText = "Loading...";
     try {
         const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData' }) });
         const d = await r.json();
         
-        // Ambil data milik user yang sedang login, urutkan dari yang terbaru
-        const mySales = d.sales.slice(1).filter(s => s[5] === user).reverse();
-        
-        document.getElementById('h-list').innerHTML = mySales.map(s => {
-            const tgl = new Date(s[0]).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            const itemTeks = s[1]; // Rincian menu (teks)
-            const totalHrg = parseInt(s[2]) || 0;
-            const bayarHrg = parseInt(s[3]) || 0;
-            const kembaliHrg = parseInt(s[4]) || 0;
-            const namaKasir = s[5];
+        let omset = 0, cups = 0;
+        d.sales.slice(1).forEach(s => {
+            const rowDate = new Date(s[0]).toISOString().split('T')[0];
+            if(rowDate === tgl) {
+                omset += parseInt(s[2]) || 0;
+                cups += parseInt(s[6]) || 0;
+            }
+        });
 
-            // Masukkan semua data ke dalam fungsi printResi saat tombol diklik
-            return `
-            <tr>
-                <td>${tgl}</td>
-                <td>${totalHrg.toLocaleString()}</td>
-                <td>
-                    <button class="btn btn-primary btn-sm py-0" 
-                    onclick="printResi('${itemTeks}', ${totalHrg}, ${bayarHrg}, ${kembaliHrg}, '${namaKasir}')">
-                        <i class="bi bi-printer"></i>
-                    </button>
-                </td>
-            </tr>`;
-        }).join('');
+        let stokHtml = "";
+        let sisaCupHeader = 0;
+
+        // Tarik data stok dari sheet "Stok" (Data asli 85, 3500, dll)
+        if (d.stok) {
+            d.stok.slice(1).forEach(row => {
+                if(row[0] === "Cup") sisaCupHeader = row[1]; // Ambil angka 85
+                
+                stokHtml += `
+                    <div class="d-flex justify-content-between border-bottom py-2">
+                        <span>${row[0]}</span>
+                        <span class="fw-bold ${row[1] < 10 ? 'text-danger' : 'text-dark'}">${row[1]}</span>
+                    </div>`;
+            });
+        }
+
+        document.getElementById('adm-omset').innerText = "Rp " + omset.toLocaleString();
+        document.getElementById('adm-cups').innerText = cups;
+        document.getElementById('adm-stok-cup').innerText = sisaCupHeader; // Muncul 85
+        document.getElementById('adm-profit').innerText = "Rp " + (omset * 0.4).toLocaleString();
+        document.getElementById('adm-detail-stok').innerHTML = stokHtml;
+
     } catch (e) {
-        alert("Gagal memuat history");
+        alert("Gagal memproses data admin.");
     }
 }
 
-    function backToKasir() { document.getElementById('area-history').classList.add('hidden'); document.getElementById('area-kasir').classList.remove('hidden'); }
+// FUNGSI PRINT LAPORAN UNTUK ADMIN
+function printLaporanAdmin() {
+    const tgl = document.getElementById('admin-filter-date').value || "---";
+    const oms = document.getElementById('adm-omset').innerText;
+    const cup = document.getElementById('adm-cups').innerText;
+    const sisaCup = document.getElementById('adm-stok-cup').innerText;
+    
+    let detailStok = "";
+    document.querySelectorAll('#adm-detail-stok div').forEach(el => {
+        detailStok += el.innerText.replace("\n", ": ") + "\n";
+    });
+
+    let t = "   LAPORAN HARIAN YA!COOL\n";
+    t += "   Tanggal: " + tgl + "\n";
+    t += "--------------------------------\n";
+    t += "OMSET       : " + oms + "\n";
+    t += "CUP TERJUAL : " + cup + "\n";
+    t += "SISA CUP    : " + sisaCup + "\n";
+    t += "--------------------------------\n";
+    t += "DETAIL STOK BAHAN:\n";
+    t += detailStok;
+    t += "--------------------------------\n\n\n\n";
+
+    // Kirim ke printer via RAWBT
+    window.location.href = "rawbt:base64," + btoa(unescape(encodeURIComponent(t)));
+}
+    async function doPay() {
+        const tot = parseInt(document.getElementById('v-total').innerText.replace(/\D/g,''));
+        const cash = parseInt(document.getElementById('v-cash').value);
+        if(!cart.length || cash < tot) return alert("Cek input!");
+
+        const btn = document.getElementById('btn-pay');
+        btn.innerText = "Processing..."; btn.disabled = true;
+
+        const payload = {
+            action: 'transaction', 
+            items: cart.map(x => x.n).join(", "),
+            total: tot, cash: cash, change: cash - tot, kasir: user,
+            itemCount: cart.filter(x => PRICING[x.n] >= 10000).length
+        };
+
+        try {
+            await fetch(API, { method: 'POST', body: JSON.stringify(payload) });
+            alert("Berhasil!");
+            location.reload();
+        } catch (e) { alert("Gagal Simpan"); btn.disabled = false; btn.innerText = "BAYAR & CETAK"; }
+    }
 </script>
 </body>
 </html>
