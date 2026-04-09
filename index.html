@@ -25,7 +25,6 @@
 
         .hidden { display: none !important; }
 
-        /* Glassmorphism Card */
         .glass-card {
             background: var(--glass);
             backdrop-filter: blur(10px);
@@ -36,18 +35,12 @@
             transition: all 0.3s ease;
         }
 
-        .glass-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.25);
-        }
-
-        /* 3D Buttons */
         .btn-3d {
             border-radius: 12px;
             border: none;
-            transition: all 0.2s active;
             box-shadow: 0 4px 0 #006da8;
             font-weight: 600;
+            transition: 0.1s;
         }
 
         .btn-3d:active {
@@ -56,58 +49,29 @@
         }
 
         .qty-btn {
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
-            border: none;
-            background: white;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-            font-weight: bold;
-            transition: 0.2s;
+            width: 38px; height: 38px;
+            border-radius: 10px; border: none;
+            background: white; box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            font-weight: bold; transition: 0.2s;
         }
 
         .qty-btn:hover { background: #f8f9fa; transform: scale(1.1); }
 
-        /* Animasi Input */
-        .form-control {
-            border-radius: 12px;
-            border: 2px solid transparent;
-            padding: 12px;
-            transition: 0.3s;
-        }
-
-        .form-control:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 15px rgba(0,147,233,0.2);
-        }
-
-        /* Logo Animation */
         .logo-area {
-            font-size: 2.5rem;
-            font-weight: 800;
+            font-size: 2.5rem; font-weight: 800;
             background: linear-gradient(to right, #0052D4, #4364F7, #6FB1FC);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             margin-bottom: 20px;
         }
 
         .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 18px;
-            text-align: center;
-            border-bottom: 5px solid var(--primary);
-            transition: 0.3s;
+            background: white; padding: 20px; border-radius: 18px;
+            text-align: center; border-bottom: 5px solid var(--primary);
         }
 
-        .stat-card:hover { transform: scale(1.05); }
-
-        /* Item Menu Style */
         .menu-item {
-            border-radius: 15px;
-            background: rgba(255,255,255,0.5);
-            margin-bottom: 10px;
-            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 15px; background: rgba(255,255,255,0.5);
+            margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.2);
             transition: 0.3s;
         }
         
@@ -119,49 +83,35 @@
         }
 
         .animate-fade { animation: fadeIn 0.5s ease forwards; }
-
         @media print { .no-print { display: none; } }
     </style>
 </head>
 <body>
 
-<!-- LOGIN PAGE -->
 <div id="p-login" class="container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
     <div class="glass-card p-5 text-center animate-fade" style="max-width: 450px; width: 90%;">
         <div class="logo-area"><i class="bi bi-snow2"></i> Ya!Cool</div>
         <p class="text-muted mb-4">Silahkan masuk ke akun Kasir/Admin</p>
-        <div class="mb-3">
-            <input type="text" id="u" class="form-control" placeholder="Username">
-        </div>
-        <div class="mb-4">
-            <input type="password" id="p" class="form-control" placeholder="Password">
-        </div>
-        <button onclick="doLogin()" id="btn-login" class="btn btn-primary btn-lg w-100 btn-3d py-3">
-            MASUK SISTEM <i class="bi bi-arrow-right-circle ms-2"></i>
-        </button>
+        <div class="mb-3"><input type="text" id="u" class="form-control" placeholder="Username"></div>
+        <div class="mb-4"><input type="password" id="p" class="form-control" placeholder="Password"></div>
+        <button onclick="doLogin()" id="btn-login" class="btn btn-primary btn-lg w-100 btn-3d py-3">MASUK SISTEM</button>
     </div>
 </div>
 
-<!-- STAFF PAGE -->
 <div id="p-staff" class="container-fluid py-4 hidden">
     <div class="row">
-        <!-- Bagian Kiri: Menu -->
         <div class="col-md-7 no-print">
-            <div class="glass-card p-4 mb-4 d-flex justify-content-between align-items-center">
+            <div class="glass-card p-4 mb-3 d-flex justify-content-between align-items-center">
                 <div>
-                    <h4 class="fw-bold m-0"><i class="bi bi-person-circle me-2 text-primary"></i> <span id="lbl-user"></span></h4>
-                    <small class="text-muted">Selamat Bekerja!</small>
+                    <h4 class="fw-bold m-0"><i class="bi bi-person-circle text-primary"></i> <span id="lbl-user"></span></h4>
+                    <small class="text-muted">Kasir Ya!Cool</small>
                 </div>
-                <button class="btn btn-danger rounded-pill px-4" onclick="location.reload()">
-                    <i class="bi bi-power me-1"></i> Keluar
-                </button>
+                <button class="btn btn-danger rounded-pill px-4" onclick="location.reload()"><i class="bi bi-power"></i></button>
             </div>
 
-            <div class="mb-3">
-                <button class="btn btn-light w-100 glass-card py-3 fw-bold text-primary" onclick="showHistory()">
-                    <i class="bi bi-clock-history me-2"></i> LIHAT RIWAYAT PENJUALAN HARI INI
-                </button>
-            </div>
+            <button class="btn btn-light w-100 glass-card py-3 fw-bold text-primary mb-3" onclick="showHistory()">
+                <i class="bi bi-clock-history me-2"></i> RIWAYAT & CETAK LAPORAN SETORAN
+            </button>
             
             <div id="area-kasir" class="glass-card p-3 animate-fade">
                 <h5 class="fw-bold mb-3 ms-2 text-primary"><i class="bi bi-grid-fill"></i> Daftar Menu</h5>
@@ -170,55 +120,52 @@
 
             <div id="area-history" class="hidden animate-fade">
                 <button class="btn btn-dark w-100 mb-3 fw-bold rounded-pill" onclick="backToKasir()">← KEMBALI KE KASIR</button>
-                <div class="glass-card p-3 overflow-auto" style="max-height: 60vh;">
-                    <table class="table table-hover">
-                        <thead class="table-light"><tr><th>Jam</th><th>Total</th><th>Aksi</th></tr></thead>
+                <div class="glass-card p-4 mb-3">
+                    <label class="small fw-bold mb-2">Pilih Tanggal Riwayat & Rekap:</label>
+                    <div class="input-group">
+                        <input type="date" id="hist-filter-date" class="form-control border-primary">
+                        <button class="btn btn-primary px-3" onclick="showHistory()"><i class="bi bi-search"></i></button>
+                        <button class="btn btn-success px-3 fw-bold" onclick="printRekapKasir()"><i class="bi bi-printer-fill me-1"></i> REKAP</button>
+                    </div>
+                </div>
+                <div class="glass-card p-3 overflow-auto" style="max-height: 50vh;">
+                    <table class="table table-hover small">
+                        <thead class="table-light"><tr><th>Tgl/Jam</th><th>Total</th><th>Aksi</th></tr></thead>
                         <tbody id="h-list"></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- Bagian Kanan: Keranjang -->
         <div class="col-md-5 no-print mt-3 mt-md-0">
             <div class="glass-card p-4 sticky-top animate-fade" style="top: 20px;">
                 <h5 class="fw-bold border-bottom pb-3 mb-3"><i class="bi bi-receipt-cutoff me-2"></i> Detail Pesanan</h5>
-                
                 <div id="cart-list" style="min-height: 100px; max-height: 200px; overflow-y: auto;" class="mb-3"></div>
-                
                 <div class="bg-primary text-white p-3 rounded-4 mb-3 d-flex justify-content-between align-items-center">
-                    <span class="h6 m-0">TOTAL TAGIHAN</span>
+                    <span class="h6 m-0">TOTAL</span>
                     <span class="h3 fw-bold m-0">Rp <span id="v-total">0</span></span>
                 </div>
-
                 <div class="mb-2">
                     <label class="small fw-bold text-muted mb-1">UANG TUNAI (CASH)</label>
-                    <div class="input-group input-group-lg">
-                        <span class="input-group-text bg-white border-end-0">Rp</span>
-                        <input type="number" id="v-cash" oninput="calc()" class="form-control border-start-0 ps-0 fw-bold text-success" placeholder="0">
-                    </div>
+                    <input type="number" id="v-cash" oninput="calc()" class="form-control form-control-lg fw-bold text-success border-2" placeholder="0">
                 </div>
-
                 <div class="d-flex justify-content-between p-3 rounded-4 bg-light mb-4 border shadow-sm">
                     <span class="fw-bold">KEMBALIAN</span>
                     <span class="fw-bold text-danger h5 m-0">Rp <span id="v-change">0</span></span>
                 </div>
-
                 <button onclick="doPay()" id="btn-pay" class="btn btn-success w-100 btn-lg btn-3d py-3 shadow-lg">
-                    CETAK STRUK & PROSES <i class="bi bi-printer-fill ms-2"></i>
+                    PROSES & CETAK STRUK <i class="bi bi-printer-fill ms-2"></i>
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- ADMIN PAGE -->
 <div id="p-admin" class="container py-5 hidden animate-fade">
     <div class="glass-card p-4 mb-4 d-flex justify-content-between align-items-center">
         <h2 class="fw-bold m-0 text-primary"><i class="bi bi-shield-lock-fill me-2"></i> Admin Panel</h2>
         <button onclick="location.reload()" class="btn btn-outline-danger px-4 rounded-pill">Logout</button>
     </div>
-
     <div class="glass-card p-4 mb-4">
         <div class="row g-3">
             <div class="col-md-4">
@@ -231,26 +178,18 @@
             </div>
         </div>
     </div>
-
     <div class="row g-4 mb-4">
         <div class="col-6 col-md-3"><div class="stat-card shadow-sm"><i class="bi bi-cash-stack h2 text-primary"></i><p class="small text-muted mt-2 mb-0">OMSET</p><h4 id="adm-omset" class="fw-bold">0</h4></div></div>
         <div class="col-6 col-md-3"><div class="stat-card shadow-sm"><i class="bi bi-cup-straw h2 text-success"></i><p class="small text-muted mt-2 mb-0">CUP TERJUAL</p><h4 id="adm-cups" class="fw-bold">0</h4></div></div>
         <div class="col-6 col-md-3"><div class="stat-card shadow-sm"><i class="bi bi-box-seam h2 text-warning"></i><p class="small text-muted mt-2 mb-0">STOK CUP</p><h4 id="adm-stok-cup" class="fw-bold">0</h4></div></div>
-        <div class="col-6 col-md-3"><div class="stat-card shadow-sm"><i class="bi bi-graph-up-arrow h2 text-danger"></i><p class="small text-muted mt-2 mb-0">ESTIMASI PROFIT</p><h4 id="adm-profit" class="fw-bold">0</h4></div></div>
+        <div class="col-6 col-md-3"><div class="stat-card shadow-sm"><i class="bi bi-graph-up-arrow h2 text-danger"></i><p class="small text-muted mt-2 mb-0">PROFIT</p><h4 id="adm-profit" class="fw-bold">0</h4></div></div>
     </div>
-
-    <div class="glass-card p-4 shadow-sm">
-        <h5 class="fw-bold mb-4"><i class="bi bi-box2-fill text-primary"></i> Detail Stok Barang</h5>
-        <div id="adm-detail-stok"></div>
-    </div>
+    <div class="glass-card p-4 shadow-sm"><div id="adm-detail-stok"></div></div>
 </div>
 
 <script>
-    // URL Web App Sandy Yusuf - LOGIKA TETAP SAMA
     const API = "https://script.google.com/macros/s/AKfycbz7Qdsnze_d0vAC460hUWOxRbEvgIDea_4RSvT8etHf7BCu9FKJASIqjRaLFtahd3Q/exec"; 
-    
-    let cart = []; 
-    let user = "";
+    let cart = []; let user = "";
     const PRICING = { "Nanas":10000, "Mangga":10000, "Strawberry":10000, "Anggur":10000, "Semangka":10000, "Melon":10000, "Jeruk":10000, "Apel":10000, "Belimbing":10000, "Boba":2000, "Jelly":2000, "Cheese":2000, "Oreo":2000, "Meses":2000 };
 
     async function doLogin() {
@@ -270,9 +209,10 @@
                 } else {
                     document.getElementById('p-staff').classList.remove('hidden');
                     document.getElementById('lbl-user').innerText = user;
+                    document.getElementById('hist-filter-date').valueAsDate = new Date();
                     initMenu();
                 }
-            } else { alert("Login Gagal! Periksa Username/Password."); location.reload(); }
+            } else { alert("Login Gagal!"); location.reload(); }
         } catch (e) { alert("Kesalahan Jaringan!"); location.reload(); }
     }
 
@@ -281,9 +221,7 @@
             <div class="col-12">
                 <div class="menu-item d-flex justify-content-between align-items-center p-3 shadow-sm">
                     <div class="d-flex align-items-center">
-                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width:40px; height:40px">
-                            <i class="bi bi-cup-hot-fill"></i>
-                        </div>
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width:40px; height:40px"><i class="bi bi-cup-hot-fill"></i></div>
                         <div><div class="fw-bold">${n}</div><small class="text-muted">Rp ${p.toLocaleString()}</small></div>
                     </div>
                     <div class="qty-control d-flex align-items-center gap-3">
@@ -300,7 +238,7 @@
         let cur = parseInt(lbl.innerText);
         if(cur + c < 0) return;
         lbl.innerText = cur + c;
-        if(c > 0) cart.push({ n, p, id: Date.now() + Math.random() });
+        if(c > 0) cart.push({ n, p });
         else { const idx = cart.findLastIndex(x => x.n === n); if(idx !== -1) cart.splice(idx, 1); }
         renderCart();
     }
@@ -309,11 +247,10 @@
         let t = 0;
         const group = cart.reduce((a, b) => { a[b.n] = (a[b.n] || 0) + 1; t += b.p; return a; }, {});
         document.getElementById('cart-list').innerHTML = Object.entries(group).map(([n, q]) => `
-            <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-white rounded shadow-sm animate-fade">
+            <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-white rounded shadow-sm">
                 <span class="small fw-bold">${q}x ${n}</span>
                 <span class="badge bg-secondary">Rp ${(q*PRICING[n]).toLocaleString()}</span>
-            </div>
-        `).join('') || '<p class="text-center text-muted small mt-3">Belum ada item dipilih</p>';
+            </div>`).join('') || '<p class="text-center text-muted small mt-3">Keranjang Kosong</p>';
         document.getElementById('v-total').innerText = t.toLocaleString();
         calc();
     }
@@ -325,87 +262,82 @@
     }
 
     function sendToPrinter(text) {
-        try {
-            const rawbtUrl = "rawbt:base64," + btoa(unescape(encodeURIComponent(text)));
-            window.location.href = rawbtUrl;
-        } catch (e) { alert("Printer Error!"); }
+        window.location.href = "rawbt:base64," + btoa(unescape(encodeURIComponent(text)));
     }
 
     async function doPay() {
         const tot = parseInt(document.getElementById('v-total').innerText.replace(/\D/g,''));
         const cash = parseInt(document.getElementById('v-cash').value);
-        if(!cart.length || isNaN(cash) || cash < tot) return alert("Nominal pembayaran tidak mencukupi!");
-
+        if(!cart.length || cash < tot) return alert("Pembayaran kurang!");
         const btn = document.getElementById('btn-pay');
-        const originalText = btn.innerHTML;
-        btn.disabled = true; btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Menyimpan...`;
-
-        const payload = {
-            action: 'transaction', 
-            items: cart.map(x => x.n).join(", "),
-            total: tot, cash: cash, change: cash - tot, kasir: user,
-            itemCount: cart.filter(x => PRICING[x.n] >= 10000).length
-        };
-
+        const originalCart = [...cart];
+        btn.disabled = true; btn.innerText = "MENYIMPAN...";
         try {
-            const r = await fetch(API, { method: 'POST', body: JSON.stringify(payload) });
+            const r = await fetch(API, { method: 'POST', body: JSON.stringify({ 
+                action: 'transaction', items: cart.map(x => x.n).join(", "), total: tot, cash: cash, change: cash - tot, kasir: user,
+                itemCount: cart.filter(x => PRICING[x.n] >= 10000).length
+            }) });
             const res = await r.json();
             if(res.success) {
-                let receiptTeks = generateReceiptText(cart, tot, cash, cash-tot, user);
-                sendToPrinter(receiptTeks);
+                sendToPrinter(generateReceiptText(originalCart, tot, cash, cash-tot, user));
                 cart = []; renderCart();
                 document.querySelectorAll('[id^="q-"]').forEach(el => el.innerText = "0");
                 document.getElementById('v-cash').value = "";
-                alert("Transaksi Berhasil!");
+                alert("Berhasil!");
             }
         } catch (e) { alert("Gagal Simpan!"); }
-        finally { btn.disabled = false; btn.innerHTML = originalText; }
+        finally { btn.disabled = false; btn.innerText = "PROSES & CETAK STRUK"; }
     }
 
     function generateReceiptText(items, tot, cash, chg, ksr) {
         let t = "      YA!COOL DRINK\n  " + new Date().toLocaleString() + "\n--------------------------------\n";
         if (Array.isArray(items)) {
             const group = items.reduce((a, b) => { a[b.n] = (a[b.n] || 0) + 1; return a; }, {});
-            for (const [n, q] of Object.entries(group)) {
-                t += `${q}x ${n.substring(0,18)}`.padEnd(22) + (q * PRICING[n]).toLocaleString().padStart(10) + "\n";
-            }
+            for (const [n, q] of Object.entries(group)) { t += `${q}x ${n.substring(0,18)}`.padEnd(22) + (q * PRICING[n]).toLocaleString().padStart(10) + "\n"; }
         } else {
-            items.split(", ").forEach(n => {
-                t += n.substring(0,21).padEnd(22) + (PRICING[n.trim()] || 0).toLocaleString().padStart(10) + "\n";
-            });
+            items.split(", ").forEach(n => { t += n.substring(0,21).padEnd(22) + (PRICING[n.trim()] || 0).toLocaleString().padStart(10) + "\n"; });
         }
-        t += "--------------------------------\n";
-        t += "TOTAL:".padEnd(20) + tot.toLocaleString().padStart(12) + "\n";
-        t += "BAYAR:".padEnd(20) + cash.toLocaleString().padStart(12) + "\n";
-        t += "KEMBALI:".padEnd(20) + chg.toLocaleString().padStart(10) + "\n";
-        t += "--------------------------------\nKasir: " + ksr + "\n\n      TERIMA KASIH\n\n\n\n";
+        t += "--------------------------------\nTOTAL:".padEnd(20) + tot.toLocaleString().padStart(12) + "\nBAYAR:".padEnd(20) + cash.toLocaleString().padStart(12) + "\nKEMBALI:".padEnd(20) + chg.toLocaleString().padStart(10) + "\n--------------------------------\nKasir: " + ksr + "\n\n      TERIMA KASIH\n\n\n\n";
         return t;
     }
 
     async function showHistory() {
         document.getElementById('area-kasir').classList.add('hidden');
         document.getElementById('area-history').classList.remove('hidden');
-        document.getElementById('h-list').innerHTML = "<tr><td colspan='3' class='text-center'>Mengambil data...</td></tr>";
+        const filterDate = document.getElementById('hist-filter-date').value;
+        document.getElementById('h-list').innerHTML = "<tr><td colspan='3' class='text-center'>Memuat...</td></tr>";
         try {
             const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData' }) });
             const d = await r.json();
-            const history = d.sales.slice(1).filter(s => s[5] === user).reverse();
+            const history = d.sales.slice(1).filter(s => {
+                const sameDate = new Date(s[0]).toISOString().split('T')[0] === filterDate;
+                return s[5] === user && sameDate;
+            }).reverse();
             document.getElementById('h-list').innerHTML = history.map(s => `
                 <tr>
-                    <td class="small">${new Date(s[0]).toLocaleTimeString()}</td>
+                    <td class="small">${new Date(s[0]).toLocaleDateString('id-ID',{day:'2-digit',month:'2-digit'})} ${new Date(s[0]).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</td>
                     <td class="fw-bold text-primary">${parseInt(s[2]).toLocaleString()}</td>
-                    <td>
-                        <button class="btn btn-sm btn-primary" onclick="printFromHistory('${s[1]}', ${s[2]}, ${s[3]}, ${s[4]}, '${s[5]}')">
-                            <i class="bi bi-printer"></i>
-                        </button>
-                    </td>
-                </tr>`).join('');
-            if(!history.length) document.getElementById('h-list').innerHTML = "<tr><td colspan='3' class='text-center text-muted'>Belum ada transaksi hari ini</td></tr>";
-        } catch (e) { alert("Gagal muat riwayat!"); }
+                    <td><button class="btn btn-sm btn-primary" onclick="sendToPrinter(generateReceiptText('${s[1]}', ${s[2]}, ${s[3]}, ${s[4]}, '${s[5]}'))"><i class="bi bi-printer"></i></button></td>
+                </tr>`).join('') || "<tr><td colspan='3' class='text-center text-muted'>Tidak ada data</td></tr>";
+        } catch (e) { alert("Gagal muat history"); }
     }
 
-    function printFromHistory(items, tot, cash, chg, ksr) {
-        sendToPrinter(generateReceiptText(items, tot, cash, chg, ksr));
+    // FITUR CETAK REKAP SETORAN KASIR
+    async function printRekapKasir() {
+        const filterDate = document.getElementById('hist-filter-date').value;
+        try {
+            const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData' }) });
+            const d = await r.json();
+            let total = 0, cups = 0, count = 0;
+            d.sales.slice(1).forEach(s => {
+                const sameDate = new Date(s[0]).toISOString().split('T')[0] === filterDate;
+                if(s[5] === user && sameDate) { total += parseInt(s[2]); cups += parseInt(s[6]); count++; }
+            });
+            let t = "     REKAP SETORAN KASIR\n    ---------------------\n";
+            t += "Kasir   : " + user + "\nTanggal : " + filterDate + "\n--------------------------------\n";
+            t += "Trans   : " + count + " Nota\nCup Laku: " + cups + " Cup\nOMSET   : Rp " + total.toLocaleString() + "\n--------------------------------\n\n      Tanda Tangan\n\n\n      (..........)\n\n\n\n";
+            sendToPrinter(t);
+        } catch (e) { alert("Gagal cetak rekap"); }
     }
 
     function backToKasir() { document.getElementById('area-history').classList.add('hidden'); document.getElementById('area-kasir').classList.remove('hidden'); }
@@ -416,9 +348,7 @@
             const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData' }) });
             const d = await r.json();
             let omset = 0, cups = 0, sisaCup = 0, stokHtml = "";
-            d.sales.slice(1).forEach(s => {
-                if(new Date(s[0]).toISOString().split('T')[0] === tgl) { omset += parseInt(s[2]); cups += parseInt(s[6]); }
-            });
+            d.sales.slice(1).forEach(s => { if(new Date(s[0]).toISOString().split('T')[0] === tgl) { omset += parseInt(s[2]); cups += parseInt(s[6]); } });
             if(d.stok) {
                 d.stok.slice(1).forEach(row => {
                     if(row[0] === "Cup") sisaCup = row[1];
