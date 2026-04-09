@@ -5,101 +5,248 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <title>Ya!Cool POS System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Ya!Cool POS System - Premium</title>
     <style>
-        body { background: #f0f2f5; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
+        :root {
+            --primary: #0093E9;
+            --secondary: #80D0C7;
+            --dark: #2b2d42;
+            --glass: rgba(255, 255, 255, 0.85);
+        }
+
+        body { 
+            background: linear-gradient(135deg, #0093E9 0%, #80D0C7 100%);
+            background-attachment: fixed;
+            font-family: 'Poppins', sans-serif; 
+            min-height: 100vh;
+            color: var(--dark);
+        }
+
         .hidden { display: none !important; }
-        .card { border-radius: 15px; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
-        .qty-control { display: flex; align-items: center; gap: 8px; }
-        .qty-btn { width: 35px; height: 35px; border-radius: 8px; border: 1px solid #ddd; background: white; font-weight: bold; }
-        .stat-card { background: white; padding: 15px; border-radius: 12px; text-align: center; border-bottom: 4px solid #0d6efd; }
-        /* Tombol History Besar */
-        .btn-history-big { padding: 12px 20px; font-weight: bold; font-size: 1rem; border-radius: 10px; width: 100%; margin-bottom: 10px; }
+
+        /* Glassmorphism Card */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.25);
+        }
+
+        /* 3D Buttons */
+        .btn-3d {
+            border-radius: 12px;
+            border: none;
+            transition: all 0.2s active;
+            box-shadow: 0 4px 0 #006da8;
+            font-weight: 600;
+        }
+
+        .btn-3d:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #006da8;
+        }
+
+        .qty-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            border: none;
+            background: white;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .qty-btn:hover { background: #f8f9fa; transform: scale(1.1); }
+
+        /* Animasi Input */
+        .form-control {
+            border-radius: 12px;
+            border: 2px solid transparent;
+            padding: 12px;
+            transition: 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(0,147,233,0.2);
+        }
+
+        /* Logo Animation */
+        .logo-area {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #0052D4, #4364F7, #6FB1FC);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 18px;
+            text-align: center;
+            border-bottom: 5px solid var(--primary);
+            transition: 0.3s;
+        }
+
+        .stat-card:hover { transform: scale(1.05); }
+
+        /* Item Menu Style */
+        .menu-item {
+            border-radius: 15px;
+            background: rgba(255,255,255,0.5);
+            margin-bottom: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: 0.3s;
+        }
+        
+        .menu-item:hover { background: white; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade { animation: fadeIn 0.5s ease forwards; }
+
         @media print { .no-print { display: none; } }
     </style>
 </head>
 <body>
 
-<div id="p-login" class="container mt-5" style="max-width: 400px;">
-    <div class="card p-4 text-center shadow">
-        <h3 class="fw-bold text-primary mb-4">Ya!Cool POS</h3>
-        <input type="text" id="u" class="form-control mb-2" placeholder="Username">
-        <input type="password" id="p" class="form-control mb-3" placeholder="Password">
-        <button onclick="doLogin()" id="btn-login" class="btn btn-primary w-100 fw-bold py-2">MASUK</button>
+<!-- LOGIN PAGE -->
+<div id="p-login" class="container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+    <div class="glass-card p-5 text-center animate-fade" style="max-width: 450px; width: 90%;">
+        <div class="logo-area"><i class="bi bi-snow2"></i> Ya!Cool</div>
+        <p class="text-muted mb-4">Silahkan masuk ke akun Kasir/Admin</p>
+        <div class="mb-3">
+            <input type="text" id="u" class="form-control" placeholder="Username">
+        </div>
+        <div class="mb-4">
+            <input type="password" id="p" class="form-control" placeholder="Password">
+        </div>
+        <button onclick="doLogin()" id="btn-login" class="btn btn-primary btn-lg w-100 btn-3d py-3">
+            MASUK SISTEM <i class="bi bi-arrow-right-circle ms-2"></i>
+        </button>
     </div>
 </div>
 
-<div id="p-staff" class="container-fluid py-3 hidden">
+<!-- STAFF PAGE -->
+<div id="p-staff" class="container-fluid py-4 hidden">
     <div class="row">
+        <!-- Bagian Kiri: Menu -->
         <div class="col-md-7 no-print">
-            <div class="bg-white p-3 rounded mb-3 shadow-sm">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-bold m-0 text-truncate">Kasir: <span id="lbl-user" class="text-primary"></span></h5>
-                    <button class="btn btn-outline-danger btn-sm" onclick="location.reload()"><i class="bi bi-power"></i></button>
+            <div class="glass-card p-4 mb-4 d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="fw-bold m-0"><i class="bi bi-person-circle me-2 text-primary"></i> <span id="lbl-user"></span></h4>
+                    <small class="text-muted">Selamat Bekerja!</small>
                 </div>
-                <button class="btn btn-primary btn-history-big" onclick="showHistory()">
-                    <i class="bi bi-clock-history me-2"></i> BUKA RIWAYAT PENJUALAN
+                <button class="btn btn-danger rounded-pill px-4" onclick="location.reload()">
+                    <i class="bi bi-power me-1"></i> Keluar
+                </button>
+            </div>
+
+            <div class="mb-3">
+                <button class="btn btn-light w-100 glass-card py-3 fw-bold text-primary" onclick="showHistory()">
+                    <i class="bi bi-clock-history me-2"></i> LIHAT RIWAYAT PENJUALAN HARI INI
                 </button>
             </div>
             
-            <div id="area-kasir" class="card p-3 shadow-sm">
-                <div id="m-list" class="list-group list-group-flush"></div>
+            <div id="area-kasir" class="glass-card p-3 animate-fade">
+                <h5 class="fw-bold mb-3 ms-2 text-primary"><i class="bi bi-grid-fill"></i> Daftar Menu</h5>
+                <div id="m-list" class="row g-2 overflow-auto" style="max-height: 60vh;"></div>
             </div>
 
-            <div id="area-history" class="hidden">
-                <button class="btn btn-secondary w-100 mb-3 fw-bold py-2" onclick="backToKasir()">← KEMBALI KE MENU</button>
-                <div class="card p-2 shadow-sm">
-                    <div class="table-responsive">
-                        <table class="table table-sm table-hover small">
-                            <thead class="table-light"><tr><th>Jam</th><th>Total</th><th>Cetak</th></tr></thead>
-                            <tbody id="h-list"></tbody>
-                        </table>
-                    </div>
+            <div id="area-history" class="hidden animate-fade">
+                <button class="btn btn-dark w-100 mb-3 fw-bold rounded-pill" onclick="backToKasir()">← KEMBALI KE KASIR</button>
+                <div class="glass-card p-3 overflow-auto" style="max-height: 60vh;">
+                    <table class="table table-hover">
+                        <thead class="table-light"><tr><th>Jam</th><th>Total</th><th>Aksi</th></tr></thead>
+                        <tbody id="h-list"></tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
+        <!-- Bagian Kanan: Keranjang -->
         <div class="col-md-5 no-print mt-3 mt-md-0">
-            <div class="card p-3 shadow border-0" style="position: sticky; top: 15px;">
-                <h6 class="fw-bold border-bottom pb-2"><i class="bi bi-cart3"></i> Pesanan</h6>
-                <div id="cart-list" style="min-height: 100px; max-height: 250px; overflow-y: auto;"></div>
-                <div class="d-flex justify-content-between h3 fw-bold text-primary mt-2"><span>TOTAL</span><span id="v-total">0</span></div>
-                <div class="mt-3">
-                    <label class="small fw-bold">Bayar Tunai (Cash):</label>
-                    <input type="number" id="v-cash" oninput="calc()" class="form-control form-control-lg fw-bold text-success" placeholder="0">
+            <div class="glass-card p-4 sticky-top animate-fade" style="top: 20px;">
+                <h5 class="fw-bold border-bottom pb-3 mb-3"><i class="bi bi-receipt-cutoff me-2"></i> Detail Pesanan</h5>
+                
+                <div id="cart-list" style="min-height: 100px; max-height: 200px; overflow-y: auto;" class="mb-3"></div>
+                
+                <div class="bg-primary text-white p-3 rounded-4 mb-3 d-flex justify-content-between align-items-center">
+                    <span class="h6 m-0">TOTAL TAGIHAN</span>
+                    <span class="h3 fw-bold m-0">Rp <span id="v-total">0</span></span>
                 </div>
-                <div class="d-flex justify-content-between mt-2 h5 text-danger fw-bold bg-light p-2 rounded"><span>Kembali:</span><span id="v-change">0</span></div>
-                <button onclick="doPay()" id="btn-pay" class="btn btn-success w-100 mt-3 btn-lg fw-bold py-3 shadow">
-                    PROSES & CETAK STRUK <i class="bi bi-printer ms-1"></i>
+
+                <div class="mb-2">
+                    <label class="small fw-bold text-muted mb-1">UANG TUNAI (CASH)</label>
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text bg-white border-end-0">Rp</span>
+                        <input type="number" id="v-cash" oninput="calc()" class="form-control border-start-0 ps-0 fw-bold text-success" placeholder="0">
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between p-3 rounded-4 bg-light mb-4 border shadow-sm">
+                    <span class="fw-bold">KEMBALIAN</span>
+                    <span class="fw-bold text-danger h5 m-0">Rp <span id="v-change">0</span></span>
+                </div>
+
+                <button onclick="doPay()" id="btn-pay" class="btn btn-success w-100 btn-lg btn-3d py-3 shadow-lg">
+                    CETAK STRUK & PROSES <i class="bi bi-printer-fill ms-2"></i>
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-<div id="p-admin" class="container py-4 hidden">
-    <div class="d-flex justify-content-between mb-4 align-items-center">
-        <h3 class="fw-bold m-0">Admin Panel</h3>
-        <button onclick="location.reload()" class="btn btn-danger btn-sm">Logout</button>
+<!-- ADMIN PAGE -->
+<div id="p-admin" class="container py-5 hidden animate-fade">
+    <div class="glass-card p-4 mb-4 d-flex justify-content-between align-items-center">
+        <h2 class="fw-bold m-0 text-primary"><i class="bi bi-shield-lock-fill me-2"></i> Admin Panel</h2>
+        <button onclick="location.reload()" class="btn btn-outline-danger px-4 rounded-pill">Logout</button>
     </div>
-    <div class="card p-3 mb-4 shadow-sm">
-        <div class="input-group">
-            <input type="date" id="admin-filter-date" class="form-control">
-            <button class="btn btn-primary" onclick="loadAdminStats()">Tarik Data</button>
-            <button class="btn btn-success" onclick="printLaporanAdmin()">Cetak Stok</button>
+
+    <div class="glass-card p-4 mb-4">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="small fw-bold">Filter Tanggal</label>
+                <input type="date" id="admin-filter-date" class="form-control">
+            </div>
+            <div class="col-md-8 d-flex align-items-end gap-2">
+                <button class="btn btn-primary btn-3d px-4" onclick="loadAdminStats()">TARIK DATA</button>
+                <button class="btn btn-success btn-3d px-4" onclick="printLaporanAdmin()">CETAK LAPORAN STOK</button>
+            </div>
         </div>
     </div>
-    <div class="row g-3 mb-4">
-        <div class="col-6 col-md-3"><div class="stat-card"><p class="small text-muted mb-1">OMSET</p><h4 id="adm-omset" class="fw-bold text-primary">0</h4></div></div>
-        <div class="col-6 col-md-3"><div class="stat-card"><p class="small text-muted mb-1">CUP</p><h4 id="adm-cups" class="fw-bold text-success">0</h4></div></div>
-        <div class="col-6 col-md-3"><div class="stat-card"><p class="small text-muted mb-1">STOK CUP</p><h4 id="adm-stok-cup" class="fw-bold text-warning">0</h4></div></div>
-        <div class="col-6 col-md-3"><div class="stat-card"><p class="small text-muted mb-1">PROFIT</p><h4 id="adm-profit" class="fw-bold text-danger">0</h4></div></div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-6 col-md-3"><div class="stat-card shadow-sm"><i class="bi bi-cash-stack h2 text-primary"></i><p class="small text-muted mt-2 mb-0">OMSET</p><h4 id="adm-omset" class="fw-bold">0</h4></div></div>
+        <div class="col-6 col-md-3"><div class="stat-card shadow-sm"><i class="bi bi-cup-straw h2 text-success"></i><p class="small text-muted mt-2 mb-0">CUP TERJUAL</p><h4 id="adm-cups" class="fw-bold">0</h4></div></div>
+        <div class="col-6 col-md-3"><div class="stat-card shadow-sm"><i class="bi bi-box-seam h2 text-warning"></i><p class="small text-muted mt-2 mb-0">STOK CUP</p><h4 id="adm-stok-cup" class="fw-bold">0</h4></div></div>
+        <div class="col-6 col-md-3"><div class="stat-card shadow-sm"><i class="bi bi-graph-up-arrow h2 text-danger"></i><p class="small text-muted mt-2 mb-0">ESTIMASI PROFIT</p><h4 id="adm-profit" class="fw-bold">0</h4></div></div>
     </div>
-    <div id="adm-detail-stok" class="card p-3 small shadow-sm"></div>
+
+    <div class="glass-card p-4 shadow-sm">
+        <h5 class="fw-bold mb-4"><i class="bi bi-box2-fill text-primary"></i> Detail Stok Barang</h5>
+        <div id="adm-detail-stok"></div>
+    </div>
 </div>
 
 <script>
-    // URL Web App Sandy Yusuf
+    // URL Web App Sandy Yusuf - LOGIKA TETAP SAMA
     const API = "https://script.google.com/macros/s/AKfycbz7Qdsnze_d0vAC460hUWOxRbEvgIDea_4RSvT8etHf7BCu9FKJASIqjRaLFtahd3Q/exec"; 
     
     let cart = []; 
@@ -109,7 +256,7 @@
     async function doLogin() {
         const u = document.getElementById('u').value, p = document.getElementById('p').value;
         if(!u || !p) return;
-        document.getElementById('btn-login').innerText = "Logging in...";
+        document.getElementById('btn-login').innerHTML = `<span class="spinner-border spinner-border-sm"></span> Loading...`;
         try {
             const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'login', user: u, pass: p }) });
             const d = await r.json();
@@ -125,18 +272,25 @@
                     document.getElementById('lbl-user').innerText = user;
                     initMenu();
                 }
-            } else { alert("User/Pass Salah!"); location.reload(); }
-        } catch (e) { alert("Masalah Koneksi!"); location.reload(); }
+            } else { alert("Login Gagal! Periksa Username/Password."); location.reload(); }
+        } catch (e) { alert("Kesalahan Jaringan!"); location.reload(); }
     }
 
     function initMenu() {
         document.getElementById('m-list').innerHTML = Object.entries(PRICING).map(([n, p]) => `
-            <div class="list-group-item d-flex justify-content-between align-items-center py-2 px-1">
-                <div><div class="fw-bold" style="font-size:0.9rem">${n}</div><small class="text-muted">Rp ${p.toLocaleString()}</small></div>
-                <div class="qty-control">
-                    <button class="qty-btn" onclick="updateQty('${n}', ${p}, -1)">-</button>
-                    <span id="q-${n.replace(/\s/g,'')}" class="fw-bold" style="min-width:20px; text-align:center">0</span>
-                    <button class="qty-btn bg-primary text-white border-0" onclick="updateQty('${n}', ${p}, 1)">+</button>
+            <div class="col-12">
+                <div class="menu-item d-flex justify-content-between align-items-center p-3 shadow-sm">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width:40px; height:40px">
+                            <i class="bi bi-cup-hot-fill"></i>
+                        </div>
+                        <div><div class="fw-bold">${n}</div><small class="text-muted">Rp ${p.toLocaleString()}</small></div>
+                    </div>
+                    <div class="qty-control d-flex align-items-center gap-3">
+                        <button class="qty-btn" onclick="updateQty('${n}', ${p}, -1)">-</button>
+                        <span id="q-${n.replace(/\s/g,'')}" class="fw-bold h5 m-0" style="min-width:25px; text-align:center">0</span>
+                        <button class="qty-btn bg-primary text-white" onclick="updateQty('${n}', ${p}, 1)">+</button>
+                    </div>
                 </div>
             </div>`).join('');
     }
@@ -155,8 +309,11 @@
         let t = 0;
         const group = cart.reduce((a, b) => { a[b.n] = (a[b.n] || 0) + 1; t += b.p; return a; }, {});
         document.getElementById('cart-list').innerHTML = Object.entries(group).map(([n, q]) => `
-            <div class="d-flex justify-content-between small py-1 border-bottom"><span>${q}x ${n}</span><span class="fw-bold">${(q*PRICING[n]).toLocaleString()}</span></div>
-        `).join('') || '<p class="text-center text-muted small mt-3">Belum ada pesanan</p>';
+            <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-white rounded shadow-sm animate-fade">
+                <span class="small fw-bold">${q}x ${n}</span>
+                <span class="badge bg-secondary">Rp ${(q*PRICING[n]).toLocaleString()}</span>
+            </div>
+        `).join('') || '<p class="text-center text-muted small mt-3">Belum ada item dipilih</p>';
         document.getElementById('v-total').innerText = t.toLocaleString();
         calc();
     }
@@ -164,26 +321,24 @@
     function calc() {
         const tot = parseInt(document.getElementById('v-total').innerText.replace(/\D/g,'')) || 0;
         const csh = parseInt(document.getElementById('v-cash').value) || 0;
-        document.getElementById('v-change').innerText = (csh - tot).toLocaleString();
+        document.getElementById('v-change').innerText = Math.max(0, csh - tot).toLocaleString();
     }
 
-    // FUNGSI PRINT RAWBT (Karyawan & Admin sama)
     function sendToPrinter(text) {
         try {
             const rawbtUrl = "rawbt:base64," + btoa(unescape(encodeURIComponent(text)));
             window.location.href = rawbtUrl;
-        } catch (e) {
-            alert("Printer RAWBT tidak merespons. Pastikan sudah terinstal.");
-        }
+        } catch (e) { alert("Printer Error!"); }
     }
 
     async function doPay() {
         const tot = parseInt(document.getElementById('v-total').innerText.replace(/\D/g,''));
         const cash = parseInt(document.getElementById('v-cash').value);
-        if(!cart.length || isNaN(cash) || cash < tot) return alert("Uang kurang atau pesanan kosong!");
+        if(!cart.length || isNaN(cash) || cash < tot) return alert("Nominal pembayaran tidak mencukupi!");
 
         const btn = document.getElementById('btn-pay');
-        btn.disabled = true; btn.innerText = "MENYIMPAN...";
+        const originalText = btn.innerHTML;
+        btn.disabled = true; btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Menyimpan...`;
 
         const payload = {
             action: 'transaction', 
@@ -196,24 +351,19 @@
             const r = await fetch(API, { method: 'POST', body: JSON.stringify(payload) });
             const res = await r.json();
             if(res.success) {
-                // CETAK OTOMATIS
                 let receiptTeks = generateReceiptText(cart, tot, cash, cash-tot, user);
                 sendToPrinter(receiptTeks);
-                
-                // RESET
                 cart = []; renderCart();
                 document.querySelectorAll('[id^="q-"]').forEach(el => el.innerText = "0");
                 document.getElementById('v-cash').value = "";
-                alert("Berhasil!");
+                alert("Transaksi Berhasil!");
             }
-        } catch (e) { alert("Gagal Simpan Database!"); }
-        finally { btn.disabled = false; btn.innerText = "BAYAR & CETAK STRUK"; }
+        } catch (e) { alert("Gagal Simpan!"); }
+        finally { btn.disabled = false; btn.innerHTML = originalText; }
     }
 
     function generateReceiptText(items, tot, cash, chg, ksr) {
         let t = "      YA!COOL DRINK\n  " + new Date().toLocaleString() + "\n--------------------------------\n";
-        
-        // Handle input baik berupa array (kasir baru) atau teks (dari history)
         if (Array.isArray(items)) {
             const group = items.reduce((a, b) => { a[b.n] = (a[b.n] || 0) + 1; return a; }, {});
             for (const [n, q] of Object.entries(group)) {
@@ -224,7 +374,6 @@
                 t += n.substring(0,21).padEnd(22) + (PRICING[n.trim()] || 0).toLocaleString().padStart(10) + "\n";
             });
         }
-        
         t += "--------------------------------\n";
         t += "TOTAL:".padEnd(20) + tot.toLocaleString().padStart(12) + "\n";
         t += "BAYAR:".padEnd(20) + cash.toLocaleString().padStart(12) + "\n";
@@ -236,36 +385,31 @@
     async function showHistory() {
         document.getElementById('area-kasir').classList.add('hidden');
         document.getElementById('area-history').classList.remove('hidden');
-        document.getElementById('h-list').innerHTML = "<tr><td colspan='3' class='text-center'>Memuat Riwayat...</td></tr>";
-        
+        document.getElementById('h-list').innerHTML = "<tr><td colspan='3' class='text-center'>Mengambil data...</td></tr>";
         try {
             const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData' }) });
             const d = await r.json();
-            // FILTER: Hanya ambil data sales milik kasir ini saja
             const history = d.sales.slice(1).filter(s => s[5] === user).reverse();
-            
             document.getElementById('h-list').innerHTML = history.map(s => `
                 <tr>
-                    <td>${new Date(s[0]).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</td>
-                    <td>${parseInt(s[2]).toLocaleString()}</td>
+                    <td class="small">${new Date(s[0]).toLocaleTimeString()}</td>
+                    <td class="fw-bold text-primary">${parseInt(s[2]).toLocaleString()}</td>
                     <td>
-                        <button class="btn btn-primary btn-sm" onclick="printFromHistory('${s[1]}', ${s[2]}, ${s[3]}, ${s[4]}, '${s[5]}')">
+                        <button class="btn btn-sm btn-primary" onclick="printFromHistory('${s[1]}', ${s[2]}, ${s[3]}, ${s[4]}, '${s[5]}')">
                             <i class="bi bi-printer"></i>
                         </button>
                     </td>
                 </tr>`).join('');
-            if(history.length === 0) document.getElementById('h-list').innerHTML = "<tr><td colspan='3' class='text-center'>Belum ada transaksi hari ini</td></tr>";
-        } catch (e) { alert("Gagal muat history!"); }
+            if(!history.length) document.getElementById('h-list').innerHTML = "<tr><td colspan='3' class='text-center text-muted'>Belum ada transaksi hari ini</td></tr>";
+        } catch (e) { alert("Gagal muat riwayat!"); }
     }
 
     function printFromHistory(items, tot, cash, chg, ksr) {
-        let text = generateReceiptText(items, tot, cash, chg, ksr);
-        sendToPrinter(text);
+        sendToPrinter(generateReceiptText(items, tot, cash, chg, ksr));
     }
 
     function backToKasir() { document.getElementById('area-history').classList.add('hidden'); document.getElementById('area-kasir').classList.remove('hidden'); }
 
-    // BAGIAN ADMIN
     async function loadAdminStats() {
         const tgl = document.getElementById('admin-filter-date').value;
         try {
@@ -278,7 +422,7 @@
             if(d.stok) {
                 d.stok.slice(1).forEach(row => {
                     if(row[0] === "Cup") sisaCup = row[1];
-                    stokHtml += `<div class="d-flex justify-content-between border-bottom py-2"><span>${row[0]}</span><span class="fw-bold">${row[1]}</span></div>`;
+                    stokHtml += `<div class="d-flex justify-content-between p-3 border-bottom bg-white mb-1 rounded"><span>${row[0]}</span><span class="fw-bold">${row[1]}</span></div>`;
                 });
             }
             document.getElementById('adm-omset').innerText = "Rp " + omset.toLocaleString();
@@ -286,7 +430,7 @@
             document.getElementById('adm-stok-cup').innerText = sisaCup;
             document.getElementById('adm-profit').innerText = "Rp " + (omset * 0.4).toLocaleString();
             document.getElementById('adm-detail-stok').innerHTML = stokHtml;
-        } catch (e) { alert("Gagal tarik data"); }
+        } catch (e) { alert("Gagal tarik data!"); }
     }
 
     function printLaporanAdmin() {
