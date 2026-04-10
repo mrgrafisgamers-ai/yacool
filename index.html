@@ -90,7 +90,7 @@
 
 <div id="p-login" class="container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
     <div class="glass-card p-5 text-center animate-fade" style="max-width: 450px; width: 90%;">
-        <div class="logo-area"><i class="bi bi-glass-cocktail"></i> Ya!Cool</div>
+        <div class="logo-area"><i class="bi bi-cup-straw"></i> Ya!Cool</div>
         <p class="text-muted mb-4">Silahkan masuk ke akun Kasir/Admin</p>
         <div class="mb-3"><input type="text" id="u" class="form-control" placeholder="Username"></div>
         <div class="mb-4"><input type="password" id="p" class="form-control" placeholder="Password"></div>
@@ -190,7 +190,7 @@
 <script>
     const API = "https://script.google.com/macros/s/AKfycbz7Qdsnze_d0vAC460hUWOxRbEvgIDea_4RSvT8etHf7BCu9FKJASIqjRaLFtahd3Q/exec"; 
     let cart = []; let user = "";
-    const PRICING = { "Nanas":10000, "Mangga":10000, "Strawberry":10000, "Anggur":10000, "Semangka":10000, "Melon":10000, "Jeruk":10000, "Apel":10000, "Belimbing":10000, "Boba":2000, "Jelly":2000, "Cheese":2000, "Oreo":2000, "Meses":2000 };
+    const PRICING = { "Mangga":10000, "Jeruk":10000, "Strawberry":10000, "Anggur":10000, "Belimbing":10000, "Jambu":10000, "Nanas":10000, "Apel":10000, "Semangka":10000, "Jelly":2000, "Cheese":2000, "Oreo":2000, };
 
     async function doLogin() {
         const u = document.getElementById('u').value, p = document.getElementById('p').value;
@@ -221,7 +221,7 @@
             <div class="col-12">
                 <div class="menu-item d-flex justify-content-between align-items-center p-3 shadow-sm">
                     <div class="d-flex align-items-center">
-                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width:40px; height:40px"><i class="bi bi-cup-hot-fill"></i></div>
+                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width:40px; height:40px"><i class="bi bi-cup-straw"></i></div>
                         <div><div class="fw-bold">${n}</div><small class="text-muted">Rp ${p.toLocaleString()}</small></div>
                     </div>
                     <div class="qty-control d-flex align-items-center gap-3">
