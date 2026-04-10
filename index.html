@@ -348,7 +348,7 @@
 
     // FITUR CETAK REKAP SETORAN KASIR
     async function printRekapKasir() {
-    const filterDate = document.getElementById('hist-filter-date').value; // Format: YYYY-MM-DD
+    const filterDate = document.getElementById('hist-filter-date').value; // Format: DD-MM-YYYY
     if (!filterDate) return alert("Pilih tanggal terlebih dahulu!");
 
     try {
@@ -379,16 +379,18 @@
             return;
         }
 
-        let t = "      REKAP SETORAN KASIR ya!cool Drink\n    ---------------------\n";
-        t += "Kasir   : " + user + "\n";
-        t += "Tanggal : " + filterDate + "\n";
-        t += "--------------------------------\n";
-        t += "Trans   : " + count + " Nota\n";
-        t += "Cup Laku: " + cups + " Cup\n";
-        t += "OMSET   : Rp " + total.toLocaleString() + "\n";
-        t += "--------------------------------\n\n";
-        t += "      Tanda Tangan\n\n\n";
-        t += "      (..........)\n\n\n\n";
+        let t = "      REKAP SETORAN KASIR\n";
+    t += "         ya!cool Drink\n"; 
+    t += "    ---------------------\n";
+    t += "Kasir   : " + user + "\n";
+    t += "Tanggal : " + filterDate + "\n";
+    t += "--------------------------------\n";
+    t += "Trans   : " + count + " Nota\n";
+    t += "Cup Laku: " + cups + " Cup\n";
+    t += "OMSET   : Rp " + total.toLocaleString('id-ID') + "\n";
+    t += "--------------------------------\n\n";
+    t += "      Tanda Tangan\n\n\n";
+    t += "      (..........)\n\n\n\n";
         
         sendToPrinter(t);
     } catch (e) { 
