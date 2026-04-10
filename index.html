@@ -290,16 +290,38 @@
     }
 
     function generateReceiptText(items, tot, cash, chg, ksr) {
-        let t = "      YA!COOL DRINK\n  " + new Date().toLocaleString() + "\n--------------------------------\n";
-        if (Array.isArray(items)) {
-            const group = items.reduce((a, b) => { a[b.n] = (a[b.n] || 0) + 1; return a; }, {});
-            for (const [n, q] of Object.entries(group)) { t += `${q}x ${n.substring(0,18)}`.padEnd(22) + (q * PRICING[n]).toLocaleString().padStart(10) + "\n"; }
-        } else {
-            items.split(", ").forEach(n => { t += n.substring(0,21).padEnd(22) + (PRICING[n.trim()] || 0).toLocaleString().padStart(10) + "\n"; });
+    // 1. Header (Gunakan spasi manual agar teks di tengah)
+    let t = "         YA!COOL DRINK\n";
+    t += "      " + new Date().toLocaleString('id-ID') + "\n";
+    t += "--------------------------------\n"; // 32 Karakter
+
+    if (Array.isArray(items)) {
+        // Mengelompokkan item yang sama
+        const group = items.reduce((a, b) => { a[b.n] = (a[b.n] || 0) + 1; return a; }, {});
+        
+        for (const [n, q] of Object.entries(group)) {
+            let hargaTotal = q * PRICING[n];
+            // Nama barang (maks 18 huruf) + jumlah beli
+            let barisNama = `${q}x ${n.substring(0, 18)}`;
+            // Gabungkan: Nama di kiri (padEnd 22), Total Harga di kanan (padStart 10)
+            t += barisNama.padEnd(22) + hargaTotal.toLocaleString('id-ID').padStart(10) + "\n";
         }
-        t += "--------------------------------\nTOTAL:".padEnd(20) + tot.toLocaleString().padStart(12) + "\nBAYAR:".padEnd(20) + cash.toLocaleString().padStart(12) + "\nKEMBALI:".padEnd(20) + chg.toLocaleString().padStart(10) + "\n--------------------------------\nKasir: " + ksr + "\n\n      TERIMA KASIH\n\n\n\n";
-        return t;
     }
+
+    // 2. Bagian Total, Bayar, Kembali
+    t += "--------------------------------\n";
+    t += "TOTAL:".padEnd(15) + "Rp " + tot.toLocaleString('id-ID').padStart(11) + "\n";
+    t += "BAYAR:".padEnd(15) + "Rp " + cash.toLocaleString('id-ID').padStart(11) + "\n";
+    t += "KEMBALI:".padEnd(15) + "Rp " + chg.toLocaleString('id-ID').padStart(11) + "\n";
+    
+    // 3. Footer
+    t += "--------------------------------\n";
+    t += "Kasir: " + ksr + "\n\n";
+    t += "       TERIMA KASIH\n";
+    t += "    SELAMAT MENIKMATI\n\n\n\n";
+    
+    return t;
+}
 
     async function showHistory() {
     document.getElementById('area-kasir').classList.add('hidden');
