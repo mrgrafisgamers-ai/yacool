@@ -348,21 +348,54 @@
 
     // FITUR CETAK REKAP SETORAN KASIR
     async function printRekapKasir() {
-        const filterDate = document.getElementById('hist-filter-date').value;
-        try {
-            const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData' }) });
-            const d = await r.json();
-            let total = 0, cups = 0, count = 0;
-            d.sales.slice(1).forEach(s => {
-                const sameDate = new Date(s[0]).toISOString().split('T')[0] === filterDate;
-                if(s[5] === user && sameDate) { total += parseInt(s[2]); cups += parseInt(s[6]); count++; }
-            });
-            let t = "     REKAP SETORAN KASIR\n    ---------------------\n";
-            t += "Kasir   : " + user + "\nTanggal : " + filterDate + "\n--------------------------------\n";
-            t += "Trans   : " + count + " Nota\nCup Laku: " + cups + " Cup\nOMSET   : Rp " + total.toLocaleString() + "\n--------------------------------\n\n      Tanda Tangan\n\n\n      (..........)\n\n\n\n";
-            sendToPrinter(t);
-        } catch (e) { alert("Gagal cetak rekap"); }
+    const filterDate = document.getElementById('hist-filter-date').value; // Format: YYYY-MM-DD
+    if (!filterDate) return alert("Pilih tanggal terlebih dahulu!");
+
+    try {
+        const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData' }) });
+        const d = await r.json();
+        
+        let total = 0, cups = 0, count = 0;
+
+        d.sales.slice(1).forEach(s => {
+            const tglTransaksi = new Date(s[0]);
+            
+            // Konversi tanggal transaksi ke format YYYY-MM-DD lokal
+            const tahun = tglTransaksi.getFullYear();
+            const bulan = String(tglTransaksi.getMonth() + 1).padStart(2, '0');
+            const hari = String(tglTransaksi.getDate()).padStart(2, '0');
+            const localDateString = `${tahun}-${bulan}-${hari}`;
+
+            // Filter berdasarkan Kasir DAN Tanggal Lokal
+            if(s[5] === user && localDateString === filterDate) { 
+                total += parseInt(s[2]); 
+                cups += parseInt(s[6]); 
+                count++; 
+            }
+        });
+
+        if (count === 0) {
+            alert("Tidak ada transaksi untuk kasir " + user + " pada tanggal " + filterDate);
+            return;
+        }
+
+        let t = "      REKAP SETORAN KASIR ya!cool Drink\n    ---------------------\n";
+        t += "Kasir   : " + user + "\n";
+        t += "Tanggal : " + filterDate + "\n";
+        t += "--------------------------------\n";
+        t += "Trans   : " + count + " Nota\n";
+        t += "Cup Laku: " + cups + " Cup\n";
+        t += "OMSET   : Rp " + total.toLocaleString() + "\n";
+        t += "--------------------------------\n\n";
+        t += "      Tanda Tangan\n\n\n";
+        t += "      (..........)\n\n\n\n";
+        
+        sendToPrinter(t);
+    } catch (e) { 
+        alert("Gagal cetak rekap. Pastikan koneksi internet stabil."); 
+        console.error(e);
     }
+}
 
     function backToKasir() { document.getElementById('area-history').classList.add('hidden'); document.getElementById('area-kasir').classList.remove('hidden'); }
 
