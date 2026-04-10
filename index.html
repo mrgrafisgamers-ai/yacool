@@ -123,12 +123,12 @@
                 <div class="glass-card p-4 mb-3">
                     <label class="small fw-bold mb-2">Pilih Tanggal Riwayat & Rekap:</label>
                     <div class="input-group">
-                        <input type="date" id="hist-filter-date" class="form-control border-primary">
+                        <input type="date" id="hist-filter-date" class="form-control border-primary" onchange="showHistory()">
                         <button class="btn btn-primary px-3" onclick="showHistory()"><i class="bi bi-search"></i></button>
                         <button class="btn btn-success px-3 fw-bold" onclick="printRekapKasir()"><i class="bi bi-printer-fill me-1"></i> REKAP</button>
                     </div>
                 </div>
-                <div class="glass-card p-3 overflow-auto" style="max-height: 50vh;">
+                <div class="glass-card p-3 overflow-auto" style="max-height: 50vh;">    
                     <table class="table table-hover small">
                         <thead class="table-light"><tr><th>Tgl/Jam</th><th>Total</th><th>Aksi</th></tr></thead>
                         <tbody id="h-list"></tbody>
@@ -302,25 +302,49 @@
     }
 
     async function showHistory() {
-        document.getElementById('area-kasir').classList.add('hidden');
-        document.getElementById('area-history').classList.remove('hidden');
-        const filterDate = document.getElementById('hist-filter-date').value;
-        document.getElementById('h-list').innerHTML = "<tr><td colspan='3' class='text-center'>Memuat...</td></tr>";
-        try {
-            const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData' }) });
-            const d = await r.json();
-            const history = d.sales.slice(1).filter(s => {
-                const sameDate = new Date(s[0]).toISOString().split('T')[0] === filterDate;
-                return s[5] === user && sameDate;
-            }).reverse();
-            document.getElementById('h-list').innerHTML = history.map(s => `
-                <tr>
-                    <td class="small">${new Date(s[0]).toLocaleDateString('id-ID',{day:'2-digit',month:'2-digit'})} ${new Date(s[0]).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</td>
-                    <td class="fw-bold text-primary">${parseInt(s[2]).toLocaleString()}</td>
-                    <td><button class="btn btn-sm btn-primary" onclick="sendToPrinter(generateReceiptText('${s[1]}', ${s[2]}, ${s[3]}, ${s[4]}, '${s[5]}'))"><i class="bi bi-printer"></i></button></td>
-                </tr>`).join('') || "<tr><td colspan='3' class='text-center text-muted'>Tidak ada data</td></tr>";
-        } catch (e) { alert("Gagal muat history"); }
+    document.getElementById('area-kasir').classList.add('hidden');
+    document.getElementById('area-history').classList.remove('hidden');
+    
+    const filterDate = document.getElementById('hist-filter-date').value; // Format: YYYY-MM-DD
+    const hList = document.getElementById('h-list');
+    hList.innerHTML = "<tr><td colspan='3' class='text-center'>Memuat...</td></tr>";
+
+    try {
+        const r = await fetch(API, { method: 'POST', body: JSON.stringify({ action: 'getData' }) });
+        const d = await r.json();
+        
+        // Filter menggunakan local date string agar tidak kena masalah Timezone UTC
+        const history = d.sales.slice(1).filter(s => {
+            const tglTransaksi = new Date(s[0]);
+            
+            // Mengubah objek tanggal transaksi ke format YYYY-MM-DD lokal
+            const tahun = tglTransaksi.getFullYear();
+            const bulan = String(tglTransaksi.getMonth() + 1).padStart(2, '0');
+            const hari = String(tglTransaksi.getDate()).padStart(2, '0');
+            const localDateString = `${tahun}-${bulan}-${hari}`;
+
+            return s[5] === user && localDateString === filterDate;
+        }).reverse();
+
+        hList.innerHTML = history.map(s => `
+            <tr>
+                <td class="small">
+                    ${new Date(s[0]).toLocaleDateString('id-ID',{day:'2-digit',month:'2-digit'})} 
+                    ${new Date(s[0]).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
+                </td>
+                <td class="fw-bold text-primary">${parseInt(s[2]).toLocaleString()}</td>
+                <td>
+                    <button class="btn btn-sm btn-primary" onclick="sendToPrinter(generateReceiptText('${s[1]}', ${s[2]}, ${s[3]}, ${s[4]}, '${s[5]}'))">
+                        <i class="bi bi-printer"></i>
+                    </button>
+                </td>
+            </tr>`).join('') || "<tr><td colspan='3' class='text-center text-muted'>Tidak ada data pada tanggal ini</td></tr>";
+            
+    } catch (e) { 
+        alert("Gagal muat history"); 
+        console.error(e);
     }
+}
 
     // FITUR CETAK REKAP SETORAN KASIR
     async function printRekapKasir() {
