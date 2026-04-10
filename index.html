@@ -290,35 +290,38 @@
     }
 
     function generateReceiptText(items, tot, cash, chg, ksr) {
-    // 1. Header (Gunakan spasi manual agar teks di tengah)
-    let t = "         YA!COOL DRINK\n";
-    t += "      " + new Date().toLocaleString('id-ID') + "\n";
-    t += "--------------------------------\n"; // 32 Karakter
+    // Header
+    let t = "      YA!COOL DRINK\n";
+    t += "  " + new Date().toLocaleString('id-ID') + "\n";
+    t += "--------------------------------\n";
 
     if (Array.isArray(items)) {
-        // Mengelompokkan item yang sama
         const group = items.reduce((a, b) => { a[b.n] = (a[b.n] || 0) + 1; return a; }, {});
-        
-        for (const [n, q] of Object.entries(group)) {
-            let hargaTotal = q * PRICING[n];
-            // Nama barang (maks 18 huruf) + jumlah beli
-            let barisNama = `${q}x ${n.substring(0, 18)}`;
-            // Gabungkan: Nama di kiri (padEnd 22), Total Harga di kanan (padStart 10)
-            t += barisNama.padEnd(22) + hargaTotal.toLocaleString('id-ID').padStart(10) + "\n";
+        for (const [n, q] of Object.entries(group)) { 
+            let namaItem = `${q}x ${n.substring(0,18)}`;
+            let hargaTotal = (q * PRICING[n]).toLocaleString('id-ID');
+            // Nama di kiri (22 char), Harga di kanan (10 char) = Total 32
+            t += namaItem.padEnd(22) + hargaTotal.padStart(10) + "\n"; 
         }
+    } else {
+        items.split(", ").forEach(n => { 
+            let namaItem = n.substring(0,21);
+            let harga = (PRICING[n.trim()] || 0).toLocaleString('id-ID');
+            t += namaItem.padEnd(22) + harga.padStart(10) + "\n"; 
+        });
     }
 
-    // 2. Bagian Total, Bayar, Kembali
+    // BAGIAN YANG ANDA TANYAKAN (Total, Bayar, Kembali)
+    // Kita buat Label 15 karakter dan Angka 17 karakter (Total 32)
     t += "--------------------------------\n";
-    t += "TOTAL:".padEnd(15) + "Rp " + tot.toLocaleString('id-ID').padStart(11) + "\n";
-    t += "BAYAR:".padEnd(15) + "Rp " + cash.toLocaleString('id-ID').padStart(11) + "\n";
-    t += "KEMBALI:".padEnd(15) + "Rp " + chg.toLocaleString('id-ID').padStart(11) + "\n";
+    t += "TOTAL:".padEnd(15) + tot.toLocaleString('id-ID').padStart(17) + "\n";
+    t += "BAYAR:".padEnd(15) + cash.toLocaleString('id-ID').padStart(17) + "\n";
+    t += "KEMBALI:".padEnd(15) + chg.toLocaleString('id-ID').padStart(17) + "\n";
     
-    // 3. Footer
     t += "--------------------------------\n";
     t += "Kasir: " + ksr + "\n\n";
-    t += "       TERIMA KASIH\n";
-    t += "    SELAMAT MENIKMATI\n\n\n\n";
+    t += "      TERIMA KASIH\n";
+    t += "   SAY YA! TO COOL DAY\n\n\n\n";
     
     return t;
 }
